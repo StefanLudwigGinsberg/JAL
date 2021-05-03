@@ -1,0 +1,12 @@
+*.o
+*.a
+*.obj
+*.lib
+*.exp
+*.ilk
+*.pdb
+*.dll
+*.exe
+*.cmd
+
+/tst/time.txt

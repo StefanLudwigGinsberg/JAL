@@ -1,2 +1,6 @@
 
-This is Lua 5.3.6, released on 14 Sep 2020.
+Just Another Lua (JAL) is based on Lua 5.3.6 and created by
+Stefan Ludwig Ginsberg. It is an effort to improve the language
+by revising existing features as well as adding new ones. The
+project intends to stay mostly compatible but breaking changes
+will occur to some extent. As such this is a split of Lua.

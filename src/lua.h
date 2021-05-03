@@ -479,6 +479,12 @@ struct lua_Debug {
 * CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*
+*
+*
+* Copyright (C) 2020-2021 Stefan Ludwig Ginsberg
+*
+* All changes are made under the same license as Lua itself.
 ******************************************************************************/
 
 
