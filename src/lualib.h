@@ -12,7 +12,9 @@
 
 
 /* version suffix for environment variable names */
-#define LUA_VERSUFFIX          "_" LUA_VERSION_MAJOR "_" LUA_VERSION_MINOR
+#define LUA_VERSUFFIX	"_" LUA_VERSION_MAJOR \
+						"_" LUA_VERSION_MINOR \
+						"_" LUA_VERSION_RELEASE
 
 
 LUAMOD_API int (luaopen_base) (lua_State *L);

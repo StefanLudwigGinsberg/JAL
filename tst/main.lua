@@ -105,7 +105,7 @@ RUN('env LUA_INIT= LUA_PATH=x lua %s > %s', prog, out)
 checkout("x\n")
 
 -- test LUA_PATH_version
-RUN('env LUA_INIT= LUA_PATH_5_3=y LUA_PATH=x lua %s > %s', prog, out)
+RUN('env LUA_INIT= LUA_PATH_0_0_0=y LUA_PATH=x lua %s > %s', prog, out)
 checkout("y\n")
 
 -- test LUA_CPATH
@@ -114,7 +114,7 @@ RUN('env LUA_INIT= LUA_CPATH=xuxu lua %s > %s', prog, out)
 checkout("xuxu\n")
 
 -- test LUA_CPATH_version
-RUN('env LUA_INIT= LUA_CPATH_5_3=yacc LUA_CPATH=x lua %s > %s', prog, out)
+RUN('env LUA_INIT= LUA_CPATH_0_0_0=yacc LUA_CPATH=x lua %s > %s', prog, out)
 checkout("yacc\n")
 
 -- test LUA_INIT (and its access to 'arg' table)
@@ -124,7 +124,7 @@ checkout("3.2\n")
 
 -- test LUA_INIT_version
 prepfile("print(X)")
-RUN('env LUA_INIT_5_3="X=10" LUA_INIT="X=3" lua %s > %s', prog, out)
+RUN('env LUA_INIT_0_0_0="X=10" LUA_INIT="X=3" lua %s > %s', prog, out)
 checkout("10\n")
 
 -- test LUA_INIT for files
@@ -149,9 +149,9 @@ end
 
 -- paths did not changed
 assert(not string.find(defaultpath, "xxx") and
-       string.find(defaultpath, "lua") and
+       string.find(defaultpath, "jal") and
        not string.find(defaultCpath, "xxx") and
-       string.find(defaultCpath, "lua"))
+       string.find(defaultCpath, "jal"))
 
 
 -- test replacement of ';;' to default path
@@ -287,11 +287,6 @@ checkprogout('3')
 prepfile(string.format([[io.output(%q); io.write('alo')]], out))
 RUN('lua %s', prog)
 checkout('alo')
-
--- bug in 5.2 beta (extra \0 after version line)
-RUN([[lua -v  -e"print'hello'" > %s]], out)
-t = getoutput()
-assert(string.find(t, "PUC%-Rio\nhello"))
 
 
 -- testing os.exit

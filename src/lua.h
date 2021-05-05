@@ -15,19 +15,23 @@
 #include "luaconf.h"
 
 
-#define LUA_VERSION_MAJOR	"5"
-#define LUA_VERSION_MINOR	"3"
-#define LUA_VERSION_NUM		503
-#define LUA_VERSION_RELEASE	"6"
+#define LUA_VERSION_MAJOR	"0"
+#define LUA_VERSION_MINOR	"0"
+#define LUA_VERSION_NUM		000
+#define LUA_VERSION_RELEASE	"0"
 
-#define LUA_VERSION	"Lua " LUA_VERSION_MAJOR "." LUA_VERSION_MINOR
-#define LUA_RELEASE	LUA_VERSION "." LUA_VERSION_RELEASE
-#define LUA_COPYRIGHT	LUA_RELEASE "  Copyright (C) 1994-2020 Lua.org, PUC-Rio"
-#define LUA_AUTHORS	"R. Ierusalimschy, L. H. de Figueiredo, W. Celes"
+#define LUA_VERSION LUA_VERSION_MAJOR "." \
+                    LUA_VERSION_MINOR "." \
+                    LUA_VERSION_RELEASE
+#define LUA_RELEASE "JAL " LUA_VERSION " Pre-Release"
+#define LUA_COPYRIGHT "Copyright (C) 1994-2020 Lua.org, PUC-Rio" " " \
+                      "as well as Copyright (C) 2020-2021 SLG"
+#define LUA_AUTHORS "R. Ierusalimschy, L. H. de Figueiredo, W. Celes" " " \
+                    "and Stefan Ludwig Ginsberg"
 
 
-/* mark for precompiled code ('<esc>Lua') */
-#define LUA_SIGNATURE	"\x1bLua"
+/* mark for precompiled code ('<esc>JAL') */
+#define LUA_SIGNATURE	"\x1bJAL"
 
 /* option for multiple returns in 'lua_pcall' and 'lua_call' */
 #define LUA_MULTRET	(-1)
@@ -130,12 +134,6 @@ typedef void * (*lua_Alloc) (void *ud, void *ptr, size_t osize, size_t nsize);
 #if defined(LUA_USER_H)
 #include LUA_USER_H
 #endif
-
-
-/*
-** RCS ident string
-*/
-extern const char lua_ident[];
 
 
 /*

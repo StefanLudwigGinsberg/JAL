@@ -183,7 +183,9 @@ static void DumpFunction (const Proto *f, TString *psource, DumpState *D) {
 
 static void DumpHeader (DumpState *D) {
   DumpLiteral(LUA_SIGNATURE, D);
-  DumpByte(LUAC_VERSION, D);
+  DumpByte(STR2INT(LUA_VERSION_MAJOR), D);
+  DumpByte(STR2INT(LUA_VERSION_MINOR), D);
+  DumpByte(STR2INT(LUA_VERSION_RELEASE), D);
   DumpByte(LUAC_FORMAT, D);
   DumpLiteral(LUAC_DATA, D);
   DumpByte(sizeof(int), D);

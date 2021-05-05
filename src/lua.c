@@ -27,7 +27,7 @@
 #endif
 
 #if !defined(LUA_PROGNAME)
-#define LUA_PROGNAME		"lua"
+#define LUA_PROGNAME		"jal"
 #endif
 
 #if !defined(LUA_MAXINPUT)
@@ -209,8 +209,12 @@ static int docall (lua_State *L, int narg, int nres) {
 }
 
 
-static void print_version (void) {
+static void print_header (void) {
+  lua_writestring(LUA_RELEASE, strlen(LUA_RELEASE));
+  lua_writestring(" *** ", 5);
   lua_writestring(LUA_COPYRIGHT, strlen(LUA_COPYRIGHT));
+  lua_writestring(" *** ", 5);
+  lua_writestring(LUA_AUTHORS, strlen(LUA_AUTHORS));
   lua_writeline();
 }
 
@@ -563,7 +567,7 @@ static int pmain (lua_State *L) {
     return 0;
   }
   if (args & has_v)  /* option '-v'? */
-    print_version();
+    print_header();
   if (args & has_E) {  /* option '-E'? */
     lua_pushboolean(L, 1);  /* signal for libraries to ignore env. vars. */
     lua_setfield(L, LUA_REGISTRYINDEX, "LUA_NOENV");
@@ -583,7 +587,7 @@ static int pmain (lua_State *L) {
     doREPL(L);  /* do read-eval-print loop */
   else if (script == argc && !(args & (has_e | has_v))) {  /* no arguments? */
     if (lua_stdin_is_tty()) {  /* running in interactive mode? */
-      print_version();
+      print_header();
       doREPL(L);  /* do read-eval-print loop */
     }
     else dofile(L, NULL);  /* executes stdin as a file */

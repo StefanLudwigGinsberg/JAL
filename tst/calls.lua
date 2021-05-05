@@ -363,9 +363,11 @@ assert((function (a) return a end)() == nil)
 
 print("testing binary chunks")
 do
-  local header = string.pack("c4BBc6BBBBBj",
-    "\27Lua",                -- signature
-    5*16 + 3,                -- version 5.3
+  local header = string.pack("c4BBBBc6BBBBBj",
+    "\27JAL",                -- signature
+    0,                       -- major
+    0,                       -- minor
+    0,                       -- release
     0,                       -- format
     "\x19\x93\r\n\x1a\n",    -- data
     string.packsize("i"),    -- sizeof(int)
