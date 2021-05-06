@@ -241,7 +241,7 @@ static void fchecksize (LoadState *S, size_t size, const char *tname) {
 #define checksize(S,t)	fchecksize(S,sizeof(t),#t)
 
 static void checkHeader (LoadState *S) {
-  checkliteral(S, LUA_SIGNATURE + 1, "not a");  /* 1st char already checked */
+  checkliteral(S, &LUA_SIGNATURE[1], "not a");  /* 1st char already checked */
   if (LoadByte(S) != STR2INT(LUA_VERSION_MAJOR) ||
       LoadByte(S) != STR2INT(LUA_VERSION_MINOR) ||
       LoadByte(S) != STR2INT(LUA_VERSION_RELEASE))
