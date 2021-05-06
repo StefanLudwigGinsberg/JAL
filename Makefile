@@ -72,9 +72,7 @@ local:
 	$(MAKE) install INSTALL_TOP=../install
 
 none:
-	@echo "Please do 'make PLATFORM' where PLATFORM is one of these:"
-	@echo "   $(PLATS)"
-	@echo "See doc/readme.html for complete instructions."
+	@echo "Please do 'make PLATFORM' where PLATFORM is one of these: $(PLATS)"
 
 # make may get confused with test/ and install/
 dummy:
