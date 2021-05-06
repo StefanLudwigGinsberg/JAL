@@ -6,7 +6,8 @@
 PLAT= none
 
 CC= gcc -std=gnu99
-CFLAGS= -O2 -Wall -Wextra -DLUA_COMPAT_5_2 $(SYSCFLAGS) $(MYCFLAGS)
+CFLAGS= -Og -fno-omit-frame-pointer $(WFLAGS) -DLUA_COMPAT_5_2 $(SYSCFLAGS) $(MYCFLAGS)
+WFLAGS= -Werror -Wall -Wextra -Wc90-c99-compat -Wno-long-long -Wc++-compat
 LDFLAGS= $(SYSLDFLAGS) $(MYLDFLAGS)
 LIBS= -lm $(SYSLIBS) $(MYLIBS)
 
