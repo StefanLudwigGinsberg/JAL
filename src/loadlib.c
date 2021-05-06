@@ -206,7 +206,7 @@ static void *lsys_load (lua_State *L, const char *path, int seeglb) {
 
 
 static lua_CFunction lsys_sym (lua_State *L, void *lib, const char *sym) {
-  lua_CFunction f = (lua_CFunction)GetProcAddress((HMODULE)lib, sym);
+  lua_CFunction f = (lua_CFunction)((void *)GetProcAddress((HMODULE)lib, sym));
   if (f == NULL) pusherror(L);
   return f;
 }
