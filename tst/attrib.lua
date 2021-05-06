@@ -242,10 +242,7 @@ local p = ""   -- On Mac OS X, redefine this to "_"
 -- check whether loadlib works in this system
 local st, err, when = package.loadlib(DC"lib1", "*")
 if not st then
-  local f, err, when = package.loadlib("donotexist", p.."xuxu")
-  assert(not f and type(err) == "string" and when == "absent")
-  ;(Message or print)('\n >>> cannot load dynamic library <<<\n')
-  print(err, when)
+  (Message or print)('\n >>> cannot load dynamic library <<<\n')
 else
   -- tests for loadlib
   local f = assert(package.loadlib(DC"lib1", p.."onefunction"))
