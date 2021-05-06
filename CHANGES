@@ -3,6 +3,7 @@
 0.0.1:
 
 * Corrected a format used by 'concat' in the table library.
+* Handle an invalid option to 'getinfo' in the debug library.
 
 
 
