@@ -1,1 +1,11 @@
 *** List of Changes in JAL ***
+
+Pre-Release:
+
+This version added the Lua codebase including the testsuite.
+It made all of the API distinct to the project and exposed it
+uniquely through files, paths and versioning. Enforcement of
+warning-free builds was begun and a few such issues were resolved.
+It also fixed a minor issue of dependency in the testsuite.
+
+The project was made to build with debugging by default.
