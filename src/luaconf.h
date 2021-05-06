@@ -786,5 +786,31 @@
 
 
 
+/*
+** JAL
+*/
+
+#if defined(_WIN32)
+
+#include <assert.h>
+#include <windows.h>
+
+#define lua_assert assert
+#define lua_print OutputDebugStringA
+#define lua_break DebugBreak
+
+#define luai_apicheck(l,e) lua_assert(e)
+
+#else
+
+#include <assert.h>
+
+#define lua_assert assert
+
+#define luai_apicheck(l,e) lua_assert(e)
+
 #endif
 
+
+
+#endif

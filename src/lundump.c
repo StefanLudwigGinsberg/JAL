@@ -23,6 +23,7 @@
 #include "lundump.h"
 #include "lzio.h"
 
+#undef LoadString
 
 #if !defined(luai_verifycode)
 #define luai_verifycode(L,b,f)  /* empty */
