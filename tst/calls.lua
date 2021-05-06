@@ -367,7 +367,7 @@ do
     "\27JAL",                -- signature
     0,                       -- major
     0,                       -- minor
-    0,                       -- release
+    1,                       -- release
     0,                       -- format
     "\x19\x93\r\n\x1a\n",    -- data
     string.packsize("i"),    -- sizeof(int)

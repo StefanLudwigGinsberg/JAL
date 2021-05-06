@@ -17,13 +17,13 @@
 
 #define LUA_VERSION_MAJOR	"0"
 #define LUA_VERSION_MINOR	"0"
-#define LUA_VERSION_NUM		000
-#define LUA_VERSION_RELEASE	"0"
+#define LUA_VERSION_NUM		001
+#define LUA_VERSION_RELEASE	"1"
 
 #define LUA_VERSION LUA_VERSION_MAJOR "." \
                     LUA_VERSION_MINOR "." \
                     LUA_VERSION_RELEASE
-#define LUA_RELEASE "JAL " LUA_VERSION " Pre-Release"
+#define LUA_RELEASE "JAL " LUA_VERSION " Alpha"
 #define LUA_COPYRIGHT "Copyright (C) 1994-2020 Lua.org, PUC-Rio" " " \
                       "as well as Copyright (C) 2020-2021 SLG"
 #define LUA_AUTHORS "R. Ierusalimschy, L. H. de Figueiredo, W. Celes" " " \

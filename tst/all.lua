@@ -3,7 +3,7 @@
 -- See Copyright Notice at the end of this file
 
 
-local version = "JAL 0.0.0 Pre-Release"
+local version = "JAL 0.0.1 Alpha"
 if _VERSION ~= version then
   io.stderr:write("\nThis test suite is for ", version, ", not for ", _VERSION,
     "\nExiting tests\n")

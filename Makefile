@@ -44,7 +44,7 @@ TO_LIB= jal.a
 TO_MAN= manual
 
 # The Lua version.
-V= 0.0.0
+V= 0.0.1
 
 # Targets start here.
 all:	$(PLAT)
