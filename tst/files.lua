@@ -213,7 +213,7 @@ io.output(file)
 assert(not io.output():read())
 n = 0
 for l in f:lines() do io.write(l, "\n"); n = n + 1 end
-assert(tostring(f):sub(1, 5) == "file ")
+assert(string.sub(tostring(f), 1, 5) == "file ")
 assert(f:close()); io.close()
 assert(n == 6)
 checkerr("closed file", io.close, f)

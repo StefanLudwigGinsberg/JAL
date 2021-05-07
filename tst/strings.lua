@@ -47,7 +47,7 @@ assert(string.sub("123456789", mini, -4) == "123456")
 assert(string.sub("123456789", mini, maxi) == "123456789")
 assert(string.sub("123456789", mini, mini) == "")
 assert(string.sub("\000123456789",3,5) == "234")
-assert(("\000123456789"):sub(8) == "789")
+assert(string.sub("\000123456789",8) == "789")
 
 -- testing string.find
 assert(string.find("123456789", "345") == 3)
@@ -62,7 +62,7 @@ assert(string.find("", "") == 1)
 assert(string.find("", "", 1) == 1)
 assert(not string.find("", "", 2))
 assert(string.find('', 'aaa', 1) == nil)
-assert(('alo(.)alo'):find('(.)', 1, 1) == 4)
+assert(string.find('alo(.)alo', '(.)', 1, 1) == 4)
 
 assert(string.len("") == 0)
 assert(string.len("\0\0\0") == 3)

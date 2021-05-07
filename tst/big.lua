@@ -14,7 +14,7 @@ local prog = { "local y = {0" }
 for i = 1, lim do prog[#prog + 1] = i  end
 prog[#prog + 1] = "}\n"
 prog[#prog + 1] = "X = y\n"
-prog[#prog + 1] = ("assert(X[%d] == %d)"):format(lim - 1, lim - 2)
+prog[#prog + 1] = string.format("assert(X[%d] == %d)", lim - 1, lim - 2)
 prog[#prog + 1] = "return 0"
 prog = table.concat(prog, ";")
 
@@ -44,12 +44,12 @@ assert(X[lim] == lim - 1 and X[lim + 1] == lim)
 getmetatable(env).__index = function () end
 getmetatable(env).__newindex = function () end
 local e, m = pcall(f)
-assert(not e and m:find("global 'X'"))
+assert(not e and string.find(m, "global 'X'"))
 
 -- errors in metamethods 
 getmetatable(env).__newindex = function () error("hi") end
 local e, m = xpcall(f, debug.traceback)
-assert(not e and m:find("'__newindex'"))
+assert(not e and string.find(m, "'__newindex'"))
 
 f, X = nil
 

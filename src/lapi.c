@@ -703,7 +703,7 @@ LUA_API int lua_getmetatable (lua_State *L, int objindex) {
       mt = uvalue(obj)->metatable;
       break;
     default:
-      mt = G(L)->mt[ttnov(obj)];
+      mt = NULL;
       break;
   }
   if (mt != NULL) {
@@ -868,7 +868,7 @@ LUA_API int lua_setmetatable (lua_State *L, int objindex) {
       break;
     }
     default: {
-      G(L)->mt[ttnov(obj)] = mt;
+      (void)mt;
       break;
     }
   }

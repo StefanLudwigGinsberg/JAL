@@ -66,8 +66,8 @@ for i = 1, NB do
   s = "\xAA" .. string.rep("\0", i - 1)
   assert(pack("<I" .. i, 0xAA) == s)
   assert(unpack("<I" .. i, s) == 0xAA)
-  assert(pack(">I" .. i, 0xAA) == s:reverse())
-  assert(unpack(">I" .. i, s:reverse()) == 0xAA)
+  assert(pack(">I" .. i, 0xAA) == string.reverse(s))
+  assert(unpack(">I" .. i, string.reverse(s)) == 0xAA)
 end
 
 do
@@ -81,13 +81,13 @@ do
     local s = pack("<j", -lnum)
     assert(unpack("<j", s) == -lnum)
     -- strings with (correct) extra bytes
-    assert(unpack("<i" .. i, s .. ("\xFF"):rep(i - sizeLI)) == -lnum)
-    assert(unpack(">i" .. i, ("\xFF"):rep(i - sizeLI) .. s:reverse()) == -lnum)
-    assert(unpack("<I" .. i, s .. ("\0"):rep(i - sizeLI)) == -lnum)
+    assert(unpack("<i" .. i, s .. string.rep("\xFF", i - sizeLI)) == -lnum)
+    assert(unpack(">i" .. i, string.rep("\xFF", i - sizeLI) .. string.reverse(s)) == -lnum)
+    assert(unpack("<I" .. i, s .. string.rep("\0", i - sizeLI)) == -lnum)
 
     -- overflows
-    checkerror("does not fit", unpack, "<I" .. i, ("\x00"):rep(i - 1) .. "\1")
-    checkerror("does not fit", unpack, ">i" .. i, "\1" .. ("\x00"):rep(i - 1))
+    checkerror("does not fit", unpack, "<I" .. i, string.rep("\x00", i - 1) .. "\1")
+    checkerror("does not fit", unpack, ">i" .. i, "\1" .. string.rep("\x00", i - 1))
   end
 end
 
@@ -97,16 +97,16 @@ for i = 1, sizeLI do
   local n = lnum & (~(-1 << (i * 8)))
   local s = string.sub(lstr, 1, i)
   assert(pack("<i" .. i, n) == s)
-  assert(pack(">i" .. i, n) == s:reverse())
-  assert(unpack(">i" .. i, s:reverse()) == n)
+  assert(pack(">i" .. i, n) == string.reverse(s))
+  assert(unpack(">i" .. i, string.reverse(s)) == n)
 end
 
 -- sign extension
 do
   local u = 0xf0
   for i = 1, sizeLI - 1 do
-    assert(unpack("<i"..i, "\xf0"..("\xff"):rep(i - 1)) == -16)
-    assert(unpack(">I"..i, "\xf0"..("\xff"):rep(i - 1)) == u)
+    assert(unpack("<i"..i, "\xf0"..string.rep("\xff", i - 1)) == -16)
+    assert(unpack(">I"..i, "\xf0"..string.rep("\xff", i - 1)) == u)
     u = u * 256 + 0xff
   end
 end
@@ -179,8 +179,8 @@ for _, n in ipairs{0, -1.1, 1.9, 1/0, -1/0, 1e20, -1e20, 0.1, 2000.7} do
     assert(unpack("n", pack("n", n)) == n)
     assert(unpack("<n", pack("<n", n)) == n)
     assert(unpack(">n", pack(">n", n)) == n)
-    assert(pack("<f", n) == pack(">f", n):reverse())
-    assert(pack(">d", n) == pack("<d", n):reverse())
+    assert(pack("<f", n) == string.reverse(pack(">f", n)))
+    assert(pack(">d", n) == string.reverse(pack("<d", n)))
 end
 
 -- for non-native precisions, test only with "round" numbers
@@ -212,7 +212,7 @@ end
 
 do
   local x = pack("s", "alo")
-  checkerror("too short", unpack, "s", x:sub(1, -2))
+  checkerror("too short", unpack, "s", string.sub(x, 1, -2))
   checkerror("too short", unpack, "c5", "abcd")
   checkerror("out of limits", pack, "s100", "alo")
 end

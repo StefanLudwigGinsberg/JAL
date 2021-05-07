@@ -173,7 +173,7 @@ convert(";;a;;;bc")
 
 -- test -l over multiple libraries
 prepfile("print(1); a=2; return {x=15}")
-prepfile(("print(a); print(_G['%s'].x)"):format(prog), otherprog)
+prepfile(string.format("print(a); print(_G['%s'].x)", prog), otherprog)
 RUN('env LUA_PATH="?;;" lua -l %s -l%s -lstring -l io %s > %s', prog, otherprog, otherprog, out)
 checkout("1\n2\n15\n2\n15\n")
 

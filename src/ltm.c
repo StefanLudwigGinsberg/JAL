@@ -77,7 +77,7 @@ const TValue *luaT_gettmbyobj (lua_State *L, const TValue *o, TMS event) {
       mt = uvalue(o)->metatable;
       break;
     default:
-      mt = G(L)->mt[ttnov(o)];
+      mt = NULL;
   }
   return (mt ? luaH_getshortstr(mt, G(L)->tmname[event]) : luaO_nilobject);
 }

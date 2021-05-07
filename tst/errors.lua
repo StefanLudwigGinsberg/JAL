@@ -239,7 +239,7 @@ print'+'
 a = {}; setmetatable(a, {__index = string})
 checkmessage("a:sub()", "bad self")
 checkmessage("string.sub('a', {})", "#2")
-checkmessage("('a'):sub{}", "#1")
+checkmessage("('a'):sub{}", "attempt to index")
 
 checkmessage("table.sort({1,2,3}, table.sort)", "'table.sort'")
 checkmessage("string.gsub('s', 's', setmetatable)", "'setmetatable'")
@@ -266,7 +266,7 @@ local function checksize (source)
   -- syntax error
   local _, msg = load("x", source)
   msg = string.match(msg, "^([^:]*):")   -- get source (1st part before ':')
-  assert(msg:len() <= idsize)
+  assert(string.len(msg) <= idsize)
 end
 
 for i = 60 - 10, 60 + 10 do   -- check border cases around 60

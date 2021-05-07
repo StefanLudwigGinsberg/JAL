@@ -276,9 +276,9 @@ local function checkcompt (msg, code)
 end
 checkcompt("divide by zero", "return 2 // 0")
 checkcompt(msgf2i, "return 2.3 >> 0")
-checkcompt(msgf2i, ("return 2.0^%d & 1"):format(intbits - 1))
+checkcompt(msgf2i, string.format("return 2.0^%d & 1", intbits - 1))
 checkcompt("field 'huge'", "return math.huge << 1")
-checkcompt(msgf2i, ("return 1 | 2.0^%d"):format(intbits - 1))
+checkcompt(msgf2i, string.format("return 1 | 2.0^%d", intbits - 1))
 checkcompt(msgf2i, "return 2.3 ~ '0.0'")
 
 

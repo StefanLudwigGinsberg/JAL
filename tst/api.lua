@@ -126,7 +126,7 @@ do
   local msg, st = f(nil)     -- invalid handler
   assert(st == "ERRERR" and string.find(msg, "error handling"))
 
-  local a = setmetatable({}, {__call = function (_, x) return x:upper() end})
+  local a = setmetatable({}, {__call = function (_, x) return string.upper(x) end})
   local msg, st = f(a)   -- callable handler
   assert(st == "ERRRUN" and msg == "BOLA")
 end
@@ -565,7 +565,7 @@ do
             "pushcclosure 255; return 1"
   A = T.testC(A)
   for i=1,255 do
-    assert(A(("pushvalue U%d; return 1"):format(i)) == 10)
+    assert(A(string.format("pushvalue U%d; return 1", i) == 10))
   end
   assert(A("isnull U256; return 1"))
   assert(not A("isnil U256; return 1"))

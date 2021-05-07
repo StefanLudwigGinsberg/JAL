@@ -293,7 +293,6 @@ void luaE_freethread (lua_State *L, lua_State *L1) {
 
 
 LUA_API lua_State *lua_newstate (lua_Alloc f, void *ud) {
-  int i;
   lua_State *L;
   global_State *g;
   LG *l = cast(LG *, (*f)(ud, NULL, LUA_TTHREAD, sizeof(LG)));
@@ -328,7 +327,6 @@ LUA_API lua_State *lua_newstate (lua_Alloc f, void *ud) {
   g->gcfinnum = 0;
   g->gcpause = LUAI_GCPAUSE;
   g->gcstepmul = LUAI_GCMUL;
-  for (i=0; i < LUA_NUMTAGS; i++) g->mt[i] = NULL;
   if (luaD_rawrunprotected(L, f_luaopen, NULL) != LUA_OK) {
     /* memory allocation error: free partial state */
     close_state(L);

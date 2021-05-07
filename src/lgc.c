@@ -284,16 +284,6 @@ static void reallymarkobject (global_State *g, GCObject *o) {
 
 
 /*
-** mark metamethods for basic types
-*/
-static void markmt (global_State *g) {
-  int i;
-  for (i=0; i < LUA_NUMTAGS; i++)
-    markobjectN(g, g->mt[i]);
-}
-
-
-/*
 ** mark all objects in list of being-finalized
 */
 static void markbeingfnz (global_State *g) {
@@ -339,7 +329,6 @@ static void restartcollection (global_State *g) {
   g->weak = g->allweak = g->ephemeron = NULL;
   markobject(g, g->mainthread);
   markvalue(g, &g->l_registry);
-  markmt(g);
   markbeingfnz(g);  /* mark any finalizing object left from previous cycle */
 }
 
@@ -989,9 +978,8 @@ static l_mem atomic (lua_State *L) {
   g->gcstate = GCSinsideatomic;
   g->GCmemtrav = 0;  /* start counting work */
   markobject(g, L);  /* mark running thread */
-  /* registry and global metatables may be changed by API */
+  /* registry may be changed by API */
   markvalue(g, &g->l_registry);
-  markmt(g);  /* mark global metatables */
   /* remark occasional upvalues of (maybe) dead threads */
   remarkupvals(g);
   propagateall(g);  /* propagate changes */

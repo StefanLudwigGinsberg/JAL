@@ -400,37 +400,6 @@ assert(a.x == 1 and rawget(a, "x", 3) == 1)
 
 print '+'
 
--- testing metatables for basic types
-mt = {__index = function (a,b) return a+b end,
-      __len = function (x) return math.floor(x) end}
-debug.setmetatable(10, mt)
-assert(getmetatable(-2) == mt)
-assert((10)[3] == 13)
-assert((10)["3"] == 13)
-assert(#3.45 == 3)
-debug.setmetatable(23, nil)
-assert(getmetatable(-2) == nil)
-
-debug.setmetatable(true, mt)
-assert(getmetatable(false) == mt)
-mt.__index = function (a,b) return a or b end
-assert((true)[false] == true)
-assert((false)[false] == false)
-debug.setmetatable(false, nil)
-assert(getmetatable(true) == nil)
-
-debug.setmetatable(nil, mt)
-assert(getmetatable(nil) == mt)
-mt.__add = function (a,b) return (a or 0) + (b or 0) end
-assert(10 + nil == 10)
-assert(nil + 23 == 23)
-assert(nil + nil == 0)
-debug.setmetatable(nil, nil)
-assert(getmetatable(nil) == nil)
-
-debug.setmetatable(nil, {})
-
-
 -- loops in delegation
 a = {}; setmetatable(a, a); a.__index = a; a.__newindex = a
 assert(not pcall(function (a,b) return a[b] end, a, 10))
