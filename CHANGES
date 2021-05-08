@@ -5,6 +5,7 @@
 * Corrected a format used by 'concat' in the table library.
 * Handle an invalid option to 'getinfo' in the debug library.
 * The generic metatables have been removed as a feature.
+* Support any kind of comparison with the equality metamethods.
 
 
 

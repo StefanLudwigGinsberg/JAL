@@ -238,6 +238,23 @@ void luaV_finishset (lua_State *L, const TValue *t, TValue *key,
 }
 
 
+static Table *getmt (const TValue *o) {
+  Table *mt;
+  switch (ttnov(o)) {
+    case LUA_TTABLE:
+      mt = hvalue(o)->metatable;
+      break;
+    case LUA_TUSERDATA:
+      mt = uvalue(o)->metatable;
+      break;
+    default:
+      mt = NULL;
+      break;
+  }
+  return mt;
+}
+
+
 /*
 ** Compare two strings 'ls' x 'rs', returning an integer smaller-equal-
 ** -larger than zero if 'ls' is smaller-equal-larger than 'rs'.
@@ -402,10 +419,20 @@ int luaV_lessequal (lua_State *L, const TValue *l, const TValue *r) {
 
 /*
 ** Main operation for equality of Lua values; return 't1 == t2'.
-** L == NULL means raw equality (no metamethods)
+** 'L == NULL' means raw equality (no metamethods). Metamethods are
+** called without regard to the relation of the compared values.
 */
 int luaV_equalobj (lua_State *L, const TValue *t1, const TValue *t2) {
-  const TValue *tm;
+  if (L) {  /* normal (non-raw) equality? */
+    const TValue *tm;
+    tm = fasttm(L, getmt(t1), TM_EQ);
+    if (tm == NULL)
+      tm = fasttm(L, getmt(t2), TM_EQ);
+    if (tm) {
+      luaT_callTM(L, tm, t1, t2, L->top, 1);  /* call TM */
+      return !l_isfalse(L->top);
+    }
+  }
   if (ttype(t1) != ttype(t2)) {  /* not the same variant? */
     if (ttnov(t1) != ttnov(t2) || ttnov(t1) != LUA_TNUMBER)
       return 0;  /* only numbers can be equal with different variants */
@@ -414,39 +441,19 @@ int luaV_equalobj (lua_State *L, const TValue *t1, const TValue *t2) {
       return (tointeger(t1, &i1) && tointeger(t2, &i2) && i1 == i2);
     }
   }
-  /* values have same type and same variant */
-  switch (ttype(t1)) {
+  switch (ttype(t1)) {  /* values have same type and same variant */
     case LUA_TNIL: return 1;
-    case LUA_TNUMINT: return (ivalue(t1) == ivalue(t2));
+    case LUA_TNUMINT: return ivalue(t1) == ivalue(t2);
     case LUA_TNUMFLT: return luai_numeq(fltvalue(t1), fltvalue(t2));
     case LUA_TBOOLEAN: return bvalue(t1) == bvalue(t2);  /* true must be 1 !! */
     case LUA_TLIGHTUSERDATA: return pvalue(t1) == pvalue(t2);
     case LUA_TLCF: return fvalue(t1) == fvalue(t2);
     case LUA_TSHRSTR: return eqshrstr(tsvalue(t1), tsvalue(t2));
     case LUA_TLNGSTR: return luaS_eqlngstr(tsvalue(t1), tsvalue(t2));
-    case LUA_TUSERDATA: {
-      if (uvalue(t1) == uvalue(t2)) return 1;
-      else if (L == NULL) return 0;
-      tm = fasttm(L, uvalue(t1)->metatable, TM_EQ);
-      if (tm == NULL)
-        tm = fasttm(L, uvalue(t2)->metatable, TM_EQ);
-      break;  /* will try TM */
-    }
-    case LUA_TTABLE: {
-      if (hvalue(t1) == hvalue(t2)) return 1;
-      else if (L == NULL) return 0;
-      tm = fasttm(L, hvalue(t1)->metatable, TM_EQ);
-      if (tm == NULL)
-        tm = fasttm(L, hvalue(t2)->metatable, TM_EQ);
-      break;  /* will try TM */
-    }
-    default:
-      return gcvalue(t1) == gcvalue(t2);
+    case LUA_TUSERDATA: return uvalue(t1) == uvalue(t2);
+    case LUA_TTABLE: return hvalue(t1) == hvalue(t2);
+    default: return gcvalue(t1) == gcvalue(t2);
   }
-  if (tm == NULL)  /* no TM? */
-    return 0;  /* objects are different */
-  luaT_callTM(L, tm, t1, t2, L->top, 1);  /* call TM */
-  return !l_isfalse(L->top);
 }
 
 
