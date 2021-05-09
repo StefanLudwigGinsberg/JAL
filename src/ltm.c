@@ -26,28 +26,33 @@
 
 static const char udatatypename[] = "userdata";
 
-LUAI_DDEF const char *const luaT_typenames_[LUA_TOTALTAGS] = {
+static const char *const luaT_typenames[LUA_TOTALTAGS] = {
   "no value",
   "nil", "boolean", udatatypename, "number",
   "string", "table", "function", udatatypename, "thread",
   "proto" /* this last case is used for tests only */
 };
 
+static const char *const luaT_eventname[] = {  /* ORDER TM */
+  "__index", "__newindex",
+  "__gc", "__mode", "__len", "__eq",
+  "__add", "__sub", "__mul", "__mod", "__pow",
+  "__div", "__idiv",
+  "__band", "__bor", "__bxor", "__shl", "__shr",
+  "__unm", "__bnot", "__lt", "__le",
+  "__concat", "__call"
+};
+
 
 void luaT_init (lua_State *L) {
-  static const char *const luaT_eventname[] = {  /* ORDER TM */
-    "__index", "__newindex",
-    "__gc", "__mode", "__len", "__eq",
-    "__add", "__sub", "__mul", "__mod", "__pow",
-    "__div", "__idiv",
-    "__band", "__bor", "__bxor", "__shl", "__shr",
-    "__unm", "__bnot", "__lt", "__le",
-    "__concat", "__call"
-  };
   int i;
   for (i=0; i<TM_N; i++) {
     G(L)->tmname[i] = luaS_new(L, luaT_eventname[i]);
     luaC_fix(L, obj2gco(G(L)->tmname[i]));  /* never collect these names */
+  }
+  for (i=0; i<LUA_TOTALTAGS; i++) {
+    G(L)->tpname[i] = luaS_new(L, luaT_typenames[i]);
+    luaC_fix(L, obj2gco(G(L)->tpname[i]));  /* never collect these names */
   }
 }
 
@@ -95,7 +100,7 @@ const char *luaT_objtypename (lua_State *L, const TValue *o) {
     if (ttisstring(name))  /* is '__type' a string? */
       return getstr(tsvalue(name));  /* use it as type name */
   }
-  return ttypename(ttnov(o));  /* else use standard type name */
+  return getstr(G(L)->tpname[ttnov(o) + 1]);  /* else use standard type name */
 }
 
 

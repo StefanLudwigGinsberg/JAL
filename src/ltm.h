@@ -50,11 +50,6 @@ typedef enum {
 
 #define fasttm(l,et,e)	gfasttm(G(l), et, e)
 
-#define ttypename(x)	luaT_typenames_[(x) + 1]
-
-LUAI_DDEC const char *const luaT_typenames_[LUA_TOTALTAGS];
-
-
 LUAI_FUNC const char *luaT_objtypename (lua_State *L, const TValue *o);
 
 LUAI_FUNC const TValue *luaT_gettm (Table *events, TMS event, TString *ename);
