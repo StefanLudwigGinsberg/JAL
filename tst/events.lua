@@ -116,7 +116,7 @@ local b = setmetatable({}, t)
 setmetatable(b,t)
 
 function f(op)
-  return function (...) cap = {[0] = op, ...} ; return (...) end
+  return function (self, ...) cap = {[0] = op, ...} ; return (...) end
 end
 t.__add = f("add")
 t.__sub = f("sub")
@@ -194,9 +194,8 @@ assert(rawlen(string.rep('a', 1000)) == 1000)
 
 
 t = {}
-t.__lt = function (a,b,c)
+t.__lt = function (self,a,b)
   collectgarbage()
-  assert(c == nil)
   if type(a) == 'table' then a = a.x end
   if type(b) == 'table' then b = b.x end
  return a<b, "dummy"
@@ -221,11 +220,10 @@ end
 
 test()
 
-t.__le = function (a,b,c)
-  assert(c == nil)
+t.__le = function (self,a,b)
   if type(a) == 'table' then a = a.x end
   if type(b) == 'table' then b = b.x end
- return a<=b, "dummy"
+  return a<=b, "dummy"
 end
 
 test()  -- retest comparisons, now using both `lt' and `le'
@@ -243,7 +241,7 @@ local function Set(x)
   return setmetatable(rawSet(x), t)
 end
 
-t.__lt = function (a,b)
+t.__lt = function (self,a,b)
   for k in pairs(a) do
     if not b[k] then return false end
     b[k] = nil
@@ -259,7 +257,7 @@ assert((Set{1,2,3,4} <= Set{1,2,3,4}))
 assert((Set{1,2,3,4} >= Set{1,2,3,4}))
 assert((Set{1,3} <= Set{3,5}))   -- wrong!! model needs a `le' method ;-)
 
-t.__le = function (a,b)
+t.__le = function (self,a,b)
   for k in pairs(a) do
     if not b[k] then return false end
   end
@@ -270,7 +268,7 @@ assert(not (Set{1,3} <= Set{3,5}))   -- now its OK!
 assert(not(Set{1,3} <= Set{3,5}))
 assert(not(Set{1,3} >= Set{3,5}))
 
-t.__eq = function (a,b)
+t.__eq = function (self,a,b)
   for k in pairs(a) do
     if not b[k] then return false end
     b[k] = nil
@@ -302,10 +300,10 @@ else
   debug.setuservalue(u1, 1);
   debug.setuservalue(u2, 2);
   debug.setuservalue(u3, 1);
-  debug.setmetatable(u1, {__eq = function (a, b)
+  debug.setmetatable(u1, {__eq = function (self, a, b)
     return debug.getuservalue(a) == debug.getuservalue(b)
   end})
-  debug.setmetatable(u2, {__eq = function (a, b)
+  debug.setmetatable(u2, {__eq = function (self, a, b)
     return true
   end})
   assert(u1 == u3 and u3 == u1 and u1 ~= u2)
@@ -314,8 +312,7 @@ else
 end
 
 
-t.__concat = function (a,b,c)
-  assert(c == nil)
+t.__concat = function (self,a,b)
   if type(a) == 'table' then a = a.val end
   if type(b) == 'table' then b = b.val end
   if A then return a..b
@@ -342,7 +339,7 @@ assert(x.val == "0abcdefg")
 -- concat metamethod x numbers (bug in 5.1.1)
 c = {}
 local x
-setmetatable(c, {__concat = function (a,b)
+setmetatable(c, {__concat = function (self,a,b)
   assert(type(a) == "number" and b == c or type(b) == "number" and a == c)
   return c
 end})

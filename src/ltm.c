@@ -99,14 +99,29 @@ const char *luaT_objtypename (lua_State *L, const TValue *o) {
 }
 
 
+#define checkflag(f, o) (((f) & (o)) != 0)
+
 void luaT_callTM (lua_State *L, const TValue *f, const TValue *p1,
-                  const TValue *p2, TValue *p3, int hasres) {
+                  const TValue *p2, TValue *p3, int flags) {
+  int hasres = checkflag(flags, LUA_HASRES_META);
+  int binop = checkflag(flags, LUA_BINOP_META);
+  int isother = checkflag(flags, LUA_ISOTHER_META);
   ptrdiff_t result = savestack(L, p3);
   StkId func = L->top;
-  setobj2s(L, func, f);  /* push function (assume EXTRA_STACK) */
-  setobj2s(L, func + 1, p1);  /* 1st argument */
-  setobj2s(L, func + 2, p2);  /* 2nd argument */
-  L->top += 3;
+  if (binop) {
+    const TValue *po = (!isother) ? p1 : p2;  /* owner of call */
+    setobj2s(L, func, f);  /* push function (assume EXTRA_STACK) */
+    setobj2s(L, func + 1, po);  /* 1st argument (self) */
+    setobj2s(L, func + 2, p1);  /* 2nd argument (lhs) */
+    setobj2s(L, func + 3, p2);  /* 3rd argument (rhs) */
+    L->top += 4;
+  }
+  else {
+    setobj2s(L, func, f);  /* push function (assume EXTRA_STACK) */
+    setobj2s(L, func + 1, p1);  /* 1st argument */
+    setobj2s(L, func + 2, p2);  /* 2nd argument */
+    L->top += 3;
+  }
   if (!hasres)  /* no result? 'p3' is third argument */
     setobj2s(L, L->top++, p3);  /* 3rd argument */
   /* metamethod may yield only when called from Lua code */
@@ -123,11 +138,14 @@ void luaT_callTM (lua_State *L, const TValue *f, const TValue *p1,
 
 int luaT_callbinTM (lua_State *L, const TValue *p1, const TValue *p2,
                     StkId res, TMS event) {
+  int flags = LUA_HASRES_META | LUA_BINOP_META;
   const TValue *tm = luaT_gettmbyobj(L, p1, event);  /* try first operand */
-  if (ttisnil(tm))
+  if (ttisnil(tm)) {
     tm = luaT_gettmbyobj(L, p2, event);  /* try second operand */
+    if (!ttisnil(tm)) flags |= LUA_ISOTHER_META;
+  }
   if (ttisnil(tm)) return 0;
-  luaT_callTM(L, tm, p1, p2, res, 1);
+  luaT_callTM(L, tm, p1, p2, res, flags);
   return 1;
 }
 

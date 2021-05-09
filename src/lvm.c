@@ -179,7 +179,7 @@ void luaV_finishget (lua_State *L, const TValue *t, TValue *key, StkId val,
       /* else will try the metamethod */
     }
     if (ttisfunction(tm)) {  /* is metamethod a function? */
-      luaT_callTM(L, tm, t, key, val, 1);  /* call it */
+      luaT_callTM(L, tm, t, key, val, LUA_HASRES_META);  /* call it */
       return;
     }
     t = tm;  /* else try to access 'tm[key]' */
@@ -424,12 +424,14 @@ int luaV_lessequal (lua_State *L, const TValue *l, const TValue *r) {
 */
 int luaV_equalobj (lua_State *L, const TValue *t1, const TValue *t2) {
   if (L) {  /* normal (non-raw) equality? */
-    const TValue *tm;
-    tm = fasttm(L, getmt(t1), TM_EQ);
-    if (tm == NULL)
+    int flags = LUA_HASRES_META | LUA_BINOP_META;
+    const TValue *tm = fasttm(L, getmt(t1), TM_EQ);
+    if (tm == NULL) {
       tm = fasttm(L, getmt(t2), TM_EQ);
+      if (tm) flags |= LUA_ISOTHER_META;
+    }
     if (tm) {
-      luaT_callTM(L, tm, t1, t2, L->top, 1);  /* call TM */
+      luaT_callTM(L, tm, t1, t2, L->top, flags);  /* call TM */
       return !l_isfalse(L->top);
     }
   }
@@ -546,7 +548,7 @@ void luaV_objlen (lua_State *L, StkId ra, const TValue *rb) {
       break;
     }
   }
-  luaT_callTM(L, tm, rb, rb, ra, 1);
+  luaT_callTM(L, tm, rb, rb, ra, LUA_HASRES_META);
 }
 
 

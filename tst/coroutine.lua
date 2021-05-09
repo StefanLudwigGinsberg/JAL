@@ -541,26 +541,26 @@ print"+"
 print"testing yields inside metamethods"
 
 local mt = {
-  __eq = function(a,b) coroutine.yield(nil, "eq"); return a.x == b.x end,
-  __lt = function(a,b) coroutine.yield(nil, "lt"); return a.x < b.x end,
-  __le = function(a,b) coroutine.yield(nil, "le"); return a - b <= 0 end,
-  __add = function(a,b) coroutine.yield(nil, "add"); return a.x + b.x end,
-  __sub = function(a,b) coroutine.yield(nil, "sub"); return a.x - b.x end,
-  __mod = function(a,b) coroutine.yield(nil, "mod"); return a.x % b.x end,
-  __unm = function(a,b) coroutine.yield(nil, "unm"); return -a.x end,
-  __bnot = function(a,b) coroutine.yield(nil, "bnot"); return ~a.x end,
-  __shl = function(a,b) coroutine.yield(nil, "shl"); return a.x << b.x end,
-  __shr = function(a,b) coroutine.yield(nil, "shr"); return a.x >> b.x end,
-  __band = function(a,b)
+  __eq = function(self,a,b) coroutine.yield(nil, "eq"); return a.x == b.x end,
+  __lt = function(self,a,b) coroutine.yield(nil, "lt"); return a.x < b.x end,
+  __le = function(self,a,b) coroutine.yield(nil, "le"); return a - b <= 0 end,
+  __add = function(self,a,b) coroutine.yield(nil, "add"); return a.x + b.x end,
+  __sub = function(self,a,b) coroutine.yield(nil, "sub"); return a.x - b.x end,
+  __mod = function(self,a,b) coroutine.yield(nil, "mod"); return a.x % b.x end,
+  __unm = function(self,a,b) coroutine.yield(nil, "unm"); return -a.x end,
+  __bnot = function(self,a,b) coroutine.yield(nil, "bnot"); return ~a.x end,
+  __shl = function(self,a,b) coroutine.yield(nil, "shl"); return a.x << b.x end,
+  __shr = function(self,a,b) coroutine.yield(nil, "shr"); return a.x >> b.x end,
+  __band = function(self,a,b)
              a = type(a) == "table" and a.x or a
              b = type(b) == "table" and b.x or b
              coroutine.yield(nil, "band")
              return a & b
            end,
-  __bor = function(a,b) coroutine.yield(nil, "bor"); return a.x | b.x end,
-  __bxor = function(a,b) coroutine.yield(nil, "bxor"); return a.x ~ b.x end,
+  __bor = function(self,a,b) coroutine.yield(nil, "bor"); return a.x | b.x end,
+  __bxor = function(self,a,b) coroutine.yield(nil, "bxor"); return a.x ~ b.x end,
 
-  __concat = function(a,b)
+  __concat = function(self,a,b)
                coroutine.yield(nil, "concat");
                a = type(a) == "table" and a.x or a
                b = type(b) == "table" and b.x or b
@@ -622,12 +622,12 @@ assert(run(function() return "a" .. "b" .. a .. "c" .. c .. b .. "x" end,
 
 do   -- a few more tests for comparsion operators
   local mt1 = {
-    __le = function (a,b)
+    __le = function (self,a,b)
       coroutine.yield(10)
       return
         (type(a) == "table" and a.x or a) <= (type(b) == "table" and b.x or b)
     end,
-    __lt = function (a,b)
+    __lt = function (self,a,b)
       coroutine.yield(10)
       return
         (type(a) == "table" and a.x or a) < (type(b) == "table" and b.x or b)

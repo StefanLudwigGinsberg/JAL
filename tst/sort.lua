@@ -299,12 +299,12 @@ table.sort(A, function (x, y)
           return x<y
         end)
 
-
-tt = {__lt = function (a,b) return a.val < b.val end}
+lt = function (a,b) return a.val < b.val end
+tt = {__lt = function (self,a,b) return lt(a, b) end}
 a = {}
 for i=1,10 do  a[i] = {val=math.random(100)}; setmetatable(a[i], tt); end
 table.sort(a)
-check(a, tt.__lt)
+check(a, lt)
 check(a)
 
 print"OK"

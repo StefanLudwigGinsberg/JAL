@@ -62,8 +62,14 @@ LUAI_FUNC const TValue *luaT_gettmbyobj (lua_State *L, const TValue *o,
                                                        TMS event);
 LUAI_FUNC void luaT_init (lua_State *L);
 
+/* options for luaT_callTM */
+#define LUA_HASRES_META		1
+#define LUA_BINOP_META		2
+#define LUA_ISOTHER_META	4
+
 LUAI_FUNC void luaT_callTM (lua_State *L, const TValue *f, const TValue *p1,
-                            const TValue *p2, TValue *p3, int hasres);
+                            const TValue *p2, TValue *p3, int flags);
+
 LUAI_FUNC int luaT_callbinTM (lua_State *L, const TValue *p1, const TValue *p2,
                               StkId res, TMS event);
 LUAI_FUNC void luaT_trybinTM (lua_State *L, const TValue *p1, const TValue *p2,

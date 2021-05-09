@@ -6,6 +6,7 @@
 * Handle an invalid option to 'getinfo' in the debug library.
 * The generic metatables have been removed as a feature.
 * Support any kind of comparison with the equality metamethods.
+* Call the binary metamethods with an extra 'self' parameter.
 
 
 
