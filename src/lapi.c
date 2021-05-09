@@ -1291,3 +1291,6 @@ LUA_API void lua_upvaluejoin (lua_State *L, int fidx1, int n1,
 }
 
 
+LUA_API void lua_callmeta (lua_State *L, int nargs, int nresults) {
+  lua_call(L, nargs, nresults);
+}

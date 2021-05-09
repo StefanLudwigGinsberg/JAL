@@ -218,7 +218,7 @@ static int pairsmeta (lua_State *L, const char *method, int iszero,
   }
   else {
     lua_pushvalue(L, 1);  /* argument 'self' to metamethod */
-    lua_call(L, 1, 3);  /* get 3 values from metamethod */
+    lua_callmeta(L, 1, 3);  /* get 3 values from metamethod */
   }
   return 3;
 }

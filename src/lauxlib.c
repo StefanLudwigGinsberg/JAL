@@ -790,7 +790,7 @@ LUALIB_API int luaL_callmeta (lua_State *L, int obj, const char *event) {
   if (luaL_getmetafield(L, obj, event) == LUA_TNIL)  /* no metafield? */
     return 0;
   lua_pushvalue(L, obj);
-  lua_call(L, 1, 1);
+  lua_callmeta(L, 1, 1);
   return 1;
 }
 

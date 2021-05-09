@@ -10,6 +10,7 @@
 * Created field '__type' as a metatype replacing '__name'.
 * New routine 'rawid' for determining the identity of values.
 * Made the names of basic types fixed in the garbage collector.
+* A new API 'lua_callmeta' for calls to extended metamethods.
 
 
 
