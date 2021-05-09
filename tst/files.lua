@@ -29,13 +29,13 @@ assert(not io.close(io.stdin) and
        not io.stderr:close())
 
 
-assert(type(io.input()) == "userdata" and io.type(io.output()) == "file")
-assert(type(io.stdin) == "userdata" and io.type(io.stderr) == "file")
+assert(rawtype(io.input()) == "userdata" and io.type(io.output()) == "file")
+assert(rawtype(io.stdin) == "userdata" and io.type(io.stderr) == "file")
 assert(not io.type(8))
 local a = {}; setmetatable(a, {})
 assert(not io.type(a))
 
-assert(getmetatable(io.input()).__name == "FILE*")
+assert(getmetatable(io.input()).__type == "FILE*")
 
 local a,b,c = io.open('xuxu_nao_existe')
 assert(not a and type(b) == "string" and type(c) == "number")
@@ -533,13 +533,13 @@ assert(io.output(assert(io.open(otherfile, 'wb')))
 local filehandle = assert(io.open(file, 'r+'))
 local otherfilehandle = assert(io.open(otherfile, 'rb'))
 assert(filehandle ~= otherfilehandle)
-assert(type(filehandle) == "userdata")
+assert(rawtype(filehandle) == "userdata")
 assert(filehandle:read('l') == "qualquer coisa")
 io.input(otherfilehandle)
 assert(io.read(string.len"outra coisa") == "outra coisa")
 assert(filehandle:read('l') == "mais qualquer coisa")
 filehandle:close();
-assert(type(filehandle) == "userdata")
+assert(rawtype(filehandle) == "userdata")
 io.input(otherfilehandle)
 assert(io.read(4) == "\0\1\3\0")
 assert(io.read(3) == "\0\0\0")

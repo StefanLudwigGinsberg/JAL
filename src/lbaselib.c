@@ -201,7 +201,8 @@ static int luaB_collectgarbage (lua_State *L) {
 static int luaB_type (lua_State *L) {
   int t = lua_type(L, 1);
   luaL_argcheck(L, t != LUA_TNONE, 1, "value expected");
-  lua_pushstring(L, lua_typename(L, t));
+  if (luaL_getmetafield(L, 1, "__type") != LUA_TSTRING)
+    lua_pushstring(L, lua_typename(L, t));  /* use basic type */
   return 1;
 }
 
@@ -450,6 +451,14 @@ static int luaB_tostring (lua_State *L) {
 }
 
 
+static int luaB_rawtype (lua_State *L) {
+  int t = lua_type(L, 1);
+  luaL_argcheck(L, t != LUA_TNONE, 1, "value expected");
+  lua_pushstring(L, lua_typename(L, t));  /* use basic type */
+  return 1;
+}
+
+
 static const luaL_Reg base_funcs[] = {
   {"assert", luaB_assert},
   {"collectgarbage", luaB_collectgarbage},
@@ -470,6 +479,7 @@ static const luaL_Reg base_funcs[] = {
   {"rawlen", luaB_rawlen},
   {"rawget", luaB_rawget},
   {"rawset", luaB_rawset},
+  {"rawtype", luaB_rawtype},
   {"select", luaB_select},
   {"setmetatable", luaB_setmetatable},
   {"tonumber", luaB_tonumber},

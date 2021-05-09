@@ -145,9 +145,9 @@ checkmessage([[
 ]], "light userdata")
 _G.D = nil
 
-do   -- named objects (field '__name')
+do   -- named objects (field '__type')
   checkmessage("math.sin(io.input())", "(number expected, got FILE*)")
-  _G.XX = setmetatable({}, {__name = "My Type"})
+  _G.XX = setmetatable({}, {__type = "My Type"})
   assert(string.find(tostring(XX), "^My Type"))
   checkmessage("io.input(XX)", "(FILE* expected, got My Type)")
   checkmessage("return XX + 1", "on a My Type value")

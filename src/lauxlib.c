@@ -182,7 +182,7 @@ LUALIB_API int luaL_argerror (lua_State *L, int arg, const char *extramsg) {
 static int typeerror (lua_State *L, int arg, const char *tname) {
   const char *msg;
   const char *typearg;  /* name for the type of the actual argument */
-  if (luaL_getmetafield(L, arg, "__name") == LUA_TSTRING)
+  if (luaL_getmetafield(L, arg, "__type") == LUA_TSTRING)
     typearg = lua_tostring(L, -1);  /* use the given type name */
   else if (lua_type(L, arg) == LUA_TLIGHTUSERDATA)
     typearg = "light userdata";  /* special name for messages */
@@ -302,7 +302,7 @@ LUALIB_API int luaL_newmetatable (lua_State *L, const char *tname) {
   lua_pop(L, 1);
   lua_createtable(L, 0, 2);  /* create metatable */
   lua_pushstring(L, tname);
-  lua_setfield(L, -2, "__name");  /* metatable.__name = tname */
+  lua_setfield(L, -2, "__type");  /* metatable.__type = tname */
   lua_pushvalue(L, -1);
   lua_setfield(L, LUA_REGISTRYINDEX, tname);  /* registry.name = metatable */
   return 1;
@@ -831,12 +831,12 @@ LUALIB_API const char *luaL_tolstring (lua_State *L, int idx, size_t *len) {
         lua_pushliteral(L, "nil");
         break;
       default: {
-        int tt = luaL_getmetafield(L, idx, "__name");  /* try name */
+        int tt = luaL_getmetafield(L, idx, "__type");  /* try name */
         const char *kind = (tt == LUA_TSTRING) ? lua_tostring(L, -1) :
                                                  luaL_typename(L, idx);
         lua_pushfstring(L, "%s: %p", kind, lua_topointer(L, idx));
         if (tt != LUA_TNIL)
-          lua_remove(L, -2);  /* remove '__name' */
+          lua_remove(L, -2);  /* remove '__type' */
         break;
       }
     }
