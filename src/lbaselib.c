@@ -459,6 +459,30 @@ static int luaB_rawtype (lua_State *L) {
 }
 
 
+static int luaB_rawid (lua_State *L) {
+  int t = lua_type(L, 1);
+  switch (t) {
+    case LUA_TNIL: case LUA_TBOOLEAN:
+    case LUA_TNUMBER: case LUA_TSTRING:
+    case LUA_TLIGHTUSERDATA: {  /* primitives */
+      /* identical to the value itself */
+      lua_settop(L, 1);
+      return 1;
+    }
+    case LUA_TFUNCTION: case LUA_TTABLE:
+    case LUA_TUSERDATA: case LUA_TTHREAD: {  /* references */
+      /* identical to an object's location in memory */
+      lua_pushlightuserdata(L, (void *)lua_topointer(L, 1));
+      return 1;
+    }
+    default: {
+      lua_assert(t == LUA_TNONE);
+      return luaL_argerror(L, 1, "value expected");
+    }
+  }
+}
+
+
 static const luaL_Reg base_funcs[] = {
   {"assert", luaB_assert},
   {"collectgarbage", luaB_collectgarbage},
@@ -476,6 +500,7 @@ static const luaL_Reg base_funcs[] = {
   {"pcall", luaB_pcall},
   {"print", luaB_print},
   {"rawequal", luaB_rawequal},
+  {"rawid", luaB_rawid},
   {"rawlen", luaB_rawlen},
   {"rawget", luaB_rawget},
   {"rawset", luaB_rawset},
