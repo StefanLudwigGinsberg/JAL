@@ -317,6 +317,8 @@ static void tryfuncTM (lua_State *L, StkId func) {
   StkId p;
   if (!ttisfunction(tm))
     luaG_typeerror(L, func, "call");
+  if (ttisproxy(func))  /* calling a proxy? */
+    setobj2s(L, func, &pxvalue(func)->value);
   /* Open a hole inside the stack at 'func' */
   for (p = L->top; p > func; p--)
     setobjs2s(L, p, p-1);

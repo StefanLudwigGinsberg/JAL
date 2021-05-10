@@ -127,6 +127,10 @@
 	(isblack(p) && iswhite(o)) ? \
 	luaC_barrier_(L,obj2gco(p),obj2gco(o)) : cast_void(0))
 
+#define luaC_newbarrier(L,o,v) (  \
+	(iscollectable(v) && isblack(gcvalue(v))) ? \
+	luaC_barrier_(L,gcvalue(v),obj2gco(o)) : cast_void(0))
+
 #define luaC_upvalbarrier(L,uv) ( \
 	(iscollectable((uv)->v) && !upisopen(uv)) ? \
          luaC_upvalbarrier_(L,uv) : cast_void(0))

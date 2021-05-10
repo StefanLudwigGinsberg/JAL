@@ -11,6 +11,7 @@
 * New routine 'rawid' for determining the identity of values.
 * Made the names of basic types fixed in the garbage collector.
 * A new API 'lua_callmeta' for calls to extended metamethods.
+* Created new basic type 'proxy' for envelopment of values.
 
 
 

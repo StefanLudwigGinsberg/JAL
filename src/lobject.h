@@ -156,6 +156,7 @@ typedef struct lua_TValue {
 #define ttislcf(o)		checktag((o), LUA_TLCF)
 #define ttisfulluserdata(o)	checktag((o), ctb(LUA_TUSERDATA))
 #define ttisthread(o)		checktag((o), ctb(LUA_TTHREAD))
+#define ttisproxy(o)		checktag((o), ctb(LUA_TPROXY))
 #define ttisdeadkey(o)		checktag((o), LUA_TDEADKEY)
 
 
@@ -175,6 +176,7 @@ typedef struct lua_TValue {
 #define hvalue(o)	check_exp(ttistable(o), gco2t(val_(o).gc))
 #define bvalue(o)	check_exp(ttisboolean(o), val_(o).b)
 #define thvalue(o)	check_exp(ttisthread(o), gco2th(val_(o).gc))
+#define pxvalue(o)	check_exp(ttisproxy(o), gco2px(val_(o).gc))
 /* a dead value may get the 'gc' field, but cannot access its contents */
 #define deadvalue(o)	check_exp(ttisdeadkey(o), cast(void *, val_(o).gc))
 
@@ -235,6 +237,11 @@ typedef struct lua_TValue {
 #define setthvalue(L,obj,x) \
   { TValue *io = (obj); lua_State *x_ = (x); \
     val_(io).gc = obj2gco(x_); settt_(io, ctb(LUA_TTHREAD)); \
+    checkliveness(L,io); }
+
+#define setpxvalue(L,obj,x) \
+  { TValue *io = (obj); Proxy *x_ = (x); \
+    val_(io).gc = obj2gco(x_); settt_(io, ctb(LUA_TPROXY)); \
     checkliveness(L,io); }
 
 #define setclLvalue(L,obj,x) \
@@ -517,6 +524,28 @@ typedef struct Table {
 
 #define twoto(x)	(1<<(x))
 #define sizenode(t)	(twoto((t)->lsizenode))
+
+
+/*
+** Proxies
+*/
+typedef struct Proxy {
+  CommonHeader;
+  TValue value;
+  Table *metatable;
+} Proxy;
+
+
+#define setproxyvalue(L,px,o) \
+	{ const TValue *io=(o); Proxy *ipx = (px); \
+	  ipx->value.value_ = io->value_; ipx->value.tt_ = rttype(io); \
+	  checkliveness(L,io); }
+
+
+#define getproxyvalue(L,px,o) \
+	{ TValue *io=(o); const Proxy *ipx = (px); \
+	  io->value_ = ipx->value.value_; settt_(io, ipx->value.tt_); \
+	  checkliveness(L,io); }
 
 
 /*

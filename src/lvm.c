@@ -247,6 +247,9 @@ static Table *getmt (const TValue *o) {
     case LUA_TUSERDATA:
       mt = uvalue(o)->metatable;
       break;
+    case LUA_TPROXY:
+      mt = pxvalue(o)->metatable;
+      break;
     default:
       mt = NULL;
       break;
@@ -454,6 +457,7 @@ int luaV_equalobj (lua_State *L, const TValue *t1, const TValue *t2) {
     case LUA_TLNGSTR: return luaS_eqlngstr(tsvalue(t1), tsvalue(t2));
     case LUA_TUSERDATA: return uvalue(t1) == uvalue(t2);
     case LUA_TTABLE: return hvalue(t1) == hvalue(t2);
+    case LUA_TPROXY: return pxvalue(t1) == pxvalue(t2);
     default: return gcvalue(t1) == gcvalue(t2);
   }
 }

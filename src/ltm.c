@@ -29,7 +29,7 @@ static const char udatatypename[] = "userdata";
 static const char *const luaT_typenames[LUA_TOTALTAGS] = {
   "no value",
   "nil", "boolean", udatatypename, "number",
-  "string", "table", "function", udatatypename, "thread",
+  "string", "table", "function", udatatypename, "thread", "proxy",
   "proto" /* this last case is used for tests only */
 };
 
@@ -81,8 +81,12 @@ const TValue *luaT_gettmbyobj (lua_State *L, const TValue *o, TMS event) {
     case LUA_TUSERDATA:
       mt = uvalue(o)->metatable;
       break;
+    case LUA_TPROXY:
+      mt = pxvalue(o)->metatable;
+      break;
     default:
       mt = NULL;
+      break;
   }
   return (mt ? luaH_getshortstr(mt, G(L)->tmname[event]) : luaO_nilobject);
 }
@@ -95,7 +99,8 @@ const TValue *luaT_gettmbyobj (lua_State *L, const TValue *o, TMS event) {
 const char *luaT_objtypename (lua_State *L, const TValue *o) {
   Table *mt;
   if ((ttistable(o) && (mt = hvalue(o)->metatable) != NULL) ||
-      (ttisfulluserdata(o) && (mt = uvalue(o)->metatable) != NULL)) {
+      (ttisfulluserdata(o) && (mt = uvalue(o)->metatable) != NULL) ||
+      (ttisproxy(o) && (mt = pxvalue(o)->metatable) != NULL)) {
     const TValue *name = luaH_getshortstr(mt, luaS_new(L, "__type"));
     if (ttisstring(name))  /* is '__type' a string? */
       return getstr(tsvalue(name));  /* use it as type name */
@@ -113,6 +118,29 @@ void luaT_callTM (lua_State *L, const TValue *f, const TValue *p1,
   int isother = checkflag(flags, LUA_ISOTHER_META);
   ptrdiff_t result = savestack(L, p3);
   StkId func = L->top;
+  if (ttisproxy(p1) || ttisproxy(p2)) {
+    const TValue *tmp;
+    if (!isother) {
+      tmp = p1;
+      if (ttisproxy(p1)) {
+        tmp = &pxvalue(p1)->value;
+        if (ttisproxy(p2) && binop &&
+            pxvalue(p1) == pxvalue(p2))  /* special case: object is same */
+          p2 = &pxvalue(p2)->value;
+      }
+      p1 = tmp;
+    }
+    else {
+      tmp = p2;
+      if (ttisproxy(p2)) {
+        tmp = &pxvalue(p2)->value;
+        if (ttisproxy(p1) && binop &&
+            pxvalue(p1) == pxvalue(p2))  /* special case: object is same */
+          p1 = &pxvalue(p1)->value;
+      }
+      p2 = tmp;
+    }
+  }
   if (binop) {
     const TValue *po = (!isother) ? p1 : p2;  /* owner of call */
     setobj2s(L, func, f);  /* push function (assume EXTRA_STACK) */

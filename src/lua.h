@@ -73,8 +73,9 @@ typedef struct lua_State lua_State;
 #define LUA_TFUNCTION		6
 #define LUA_TUSERDATA		7
 #define LUA_TTHREAD		8
+#define LUA_TPROXY		9
 
-#define LUA_NUMTAGS		9
+#define LUA_NUMTAGS		10
 
 
 
@@ -327,6 +328,8 @@ LUA_API void      (lua_setallocf) (lua_State *L, lua_Alloc f, void *ud);
 
 LUA_API void (lua_callmeta) (lua_State *L, int nargs, int nresults);
 
+LUA_API void (lua_envelop) (lua_State *L, int idx);
+
 
 
 /*
@@ -354,6 +357,7 @@ LUA_API void (lua_callmeta) (lua_State *L, int nargs, int nresults);
 #define lua_isnil(L,n)		(lua_type(L, (n)) == LUA_TNIL)
 #define lua_isboolean(L,n)	(lua_type(L, (n)) == LUA_TBOOLEAN)
 #define lua_isthread(L,n)	(lua_type(L, (n)) == LUA_TTHREAD)
+#define lua_isproxy(L,n)	(lua_type(L, (n)) == LUA_TPROXY)
 #define lua_isnone(L,n)		(lua_type(L, (n)) == LUA_TNONE)
 #define lua_isnoneornil(L, n)	(lua_type(L, (n)) <= 0)
 
@@ -435,6 +439,8 @@ LUA_API void (lua_sethook) (lua_State *L, lua_Hook func, int mask, int count);
 LUA_API lua_Hook (lua_gethook) (lua_State *L);
 LUA_API int (lua_gethookmask) (lua_State *L);
 LUA_API int (lua_gethookcount) (lua_State *L);
+
+LUA_API void (lua_unproxy) (lua_State *L);
 
 
 struct lua_Debug {

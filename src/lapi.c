@@ -430,6 +430,7 @@ LUA_API const void *lua_topointer (lua_State *L, int idx) {
     case LUA_TTHREAD: return thvalue(o);
     case LUA_TUSERDATA: return getudatamem(uvalue(o));
     case LUA_TLIGHTUSERDATA: return pvalue(o);
+    case LUA_TPROXY: return pxvalue(o);
     default: return NULL;
   }
 }
@@ -701,6 +702,9 @@ LUA_API int lua_getmetatable (lua_State *L, int objindex) {
     case LUA_TUSERDATA:
       mt = uvalue(obj)->metatable;
       break;
+    case LUA_TPROXY:
+      mt = pxvalue(obj)->metatable;
+      break;
     default:
       mt = NULL;
       break;
@@ -853,7 +857,7 @@ LUA_API int lua_setmetatable (lua_State *L, int objindex) {
     case LUA_TTABLE: {
       hvalue(obj)->metatable = mt;
       if (mt) {
-        luaC_objbarrier(L, gcvalue(obj), mt);
+        luaC_objbarrier(L, hvalue(obj), mt);
         luaC_checkfinalizer(L, gcvalue(obj), mt);
       }
       break;
@@ -862,6 +866,14 @@ LUA_API int lua_setmetatable (lua_State *L, int objindex) {
       uvalue(obj)->metatable = mt;
       if (mt) {
         luaC_objbarrier(L, uvalue(obj), mt);
+        luaC_checkfinalizer(L, gcvalue(obj), mt);
+      }
+      break;
+    }
+    case LUA_TPROXY: {
+      pxvalue(obj)->metatable = mt;
+      if (mt) {
+        luaC_objbarrier(L, pxvalue(obj), mt);
         luaC_checkfinalizer(L, gcvalue(obj), mt);
       }
       break;
@@ -1292,5 +1304,31 @@ LUA_API void lua_upvaluejoin (lua_State *L, int fidx1, int n1,
 
 
 LUA_API void lua_callmeta (lua_State *L, int nargs, int nresults) {
+  StkId o;
+  lua_lock(L);
+  api_checknelems(L, (nargs + 1));
+  o = L->top - (nargs + 1) + 1;
+  if (ttisproxy(o)) {
+    TValue val;
+    getproxyvalue(L, pxvalue(o), &val);
+    setobj2s(L, o, &val);
+  }
+  lua_unlock(L);
   lua_call(L, nargs, nresults);
+}
+
+
+LUA_API void lua_envelop (lua_State *L, int idx) {
+  GCObject *o;
+  Proxy *px;
+  lua_lock(L);
+  o = luaC_newobj(L, LUA_TPROXY, sizeof(Proxy));
+  px = gco2px(o);
+  px->metatable = NULL;  /* no initial metatable */
+  setproxyvalue(L, px, index2addr(L, idx));  /* set proxied value */
+  luaC_newbarrier(L, px, &px->value);
+  setpxvalue(L, L->top, px);
+  api_incr_top(L);
+  luaC_checkGC(L);
+  lua_unlock(L);
 }

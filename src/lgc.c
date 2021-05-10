@@ -250,13 +250,25 @@ static void reallymarkobject (global_State *g, GCObject *o) {
       break;
     }
     case LUA_TUSERDATA: {
-      TValue uvalue;
+      TValue uval;
       markobjectN(g, gco2u(o)->metatable);  /* mark its metatable */
       gray2black(o);
       g->GCmemtrav += sizeudata(gco2u(o));
-      getuservalue(g->mainthread, gco2u(o), &uvalue);
-      if (valiswhite(&uvalue)) {  /* markvalue(g, &uvalue); */
-        o = gcvalue(&uvalue);
+      getuservalue(g->mainthread, gco2u(o), &uval);
+      if (valiswhite(&uval)) {  /* markvalue(g, &uval); */
+        o = gcvalue(&uval);
+        goto reentry;
+      }
+      break;
+    }
+    case LUA_TPROXY: {
+      TValue pxval;
+      markobjectN(g, gco2px(o)->metatable);  /* mark its metatable */
+      gray2black(o);
+      g->GCmemtrav += sizeof(Proxy);
+      getproxyvalue(g->mainthread, gco2px(o), &pxval);
+      if (valiswhite(&pxval)) {  /* markvalue(g, &pxval); */
+        o = gcvalue(&pxval);
         goto reentry;
       }
       break;
@@ -706,6 +718,10 @@ static void freeobj (lua_State *L, GCObject *o) {
       break;
     case LUA_TLNGSTR: {
       luaM_freemem(L, o, sizelstring(gco2ts(o)->u.lnglen));
+      break;
+    }
+    case LUA_TPROXY: {
+      luaM_freemem(L, o, sizeof(Proxy));
       break;
     }
     default: lua_assert(0);

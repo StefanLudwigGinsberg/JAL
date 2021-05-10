@@ -429,6 +429,14 @@ static int db_traceback (lua_State *L) {
 }
 
 
+static int db_unproxy (lua_State *L) {
+  if (!lua_isproxy(L, 1))
+    return luaL_argerror(L, 1, "proxy expected");
+  lua_unproxy(L);
+  return 1;  
+}
+
+
 static const luaL_Reg dblib[] = {
   {"debug", db_debug},
   {"getuservalue", db_getuservalue},
@@ -446,6 +454,7 @@ static const luaL_Reg dblib[] = {
   {"setmetatable", db_setmetatable},
   {"setupvalue", db_setupvalue},
   {"traceback", db_traceback},
+  {"unproxy", db_unproxy},
   {NULL, NULL}
 };
 

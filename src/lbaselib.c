@@ -123,10 +123,12 @@ static int luaB_getmetatable (lua_State *L) {
 
 
 static int luaB_setmetatable (lua_State *L) {
-  int t = lua_type(L, 2);
-  luaL_checktype(L, 1, LUA_TTABLE);
-  luaL_argcheck(L, t == LUA_TNIL || t == LUA_TTABLE, 2,
-                    "nil or table expected");
+  int t1 = lua_type(L, 1);
+  int t2 = lua_type(L, 2);
+  luaL_argcheck(L, t1 == LUA_TTABLE || t1 == LUA_TPROXY, 1,
+                "table or proxy expected");
+  luaL_argcheck(L, t2 == LUA_TNIL || t2 == LUA_TTABLE, 2,
+                "nil or table expected");
   if (luaL_getmetafield(L, 1, "__metatable") != LUA_TNIL)
     return luaL_error(L, "cannot change a protected metatable");
   lua_settop(L, 2);
@@ -470,7 +472,8 @@ static int luaB_rawid (lua_State *L) {
       return 1;
     }
     case LUA_TFUNCTION: case LUA_TTABLE:
-    case LUA_TUSERDATA: case LUA_TTHREAD: {  /* references */
+    case LUA_TUSERDATA: case LUA_TTHREAD:
+    case LUA_TPROXY: {  /* references */
       /* identical to an object's location in memory */
       lua_pushlightuserdata(L, (void *)lua_topointer(L, 1));
       return 1;
@@ -483,10 +486,25 @@ static int luaB_rawid (lua_State *L) {
 }
 
 
+static int luaB_envelop (lua_State *L) {
+  luaL_checkany(L, 1);
+  if (lua_isnoneornil(L, 2))
+    lua_envelop(L, 1);
+  else {
+    luaL_checktype(L, 2, LUA_TTABLE);
+    lua_envelop(L, 1);
+    lua_pushvalue(L, 2);
+    lua_setmetatable(L, -2);
+  }
+  return 1;
+}
+
+
 static const luaL_Reg base_funcs[] = {
   {"assert", luaB_assert},
   {"collectgarbage", luaB_collectgarbage},
   {"dofile", luaB_dofile},
+  {"envelop", luaB_envelop},
   {"error", luaB_error},
   {"getmetatable", luaB_getmetatable},
   {"ipairs", luaB_ipairs},

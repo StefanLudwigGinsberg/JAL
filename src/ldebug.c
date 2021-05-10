@@ -340,6 +340,16 @@ LUA_API int lua_getinfo (lua_State *L, const char *what, lua_Debug *ar) {
 }
 
 
+LUA_API void lua_unproxy (lua_State *L) {
+  TValue val;
+  lua_lock(L);
+  api_check(L, ttisproxy(L->top - 1), "proxy expected");
+  getproxyvalue(L, pxvalue(L->top - 1), &val);
+  setobj2s(L, L->top - 1, &val);  /* replace the value */
+  lua_unlock(L);
+}
+
+
 /*
 ** {======================================================
 ** Symbolic Execution
