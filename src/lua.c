@@ -23,7 +23,7 @@
 
 #if !defined(LUA_PROMPT)
 #define LUA_PROMPT		"> "
-#define LUA_PROMPT2		">> "
+#define LUA_PROMPT2		">>> "
 #endif
 
 #if !defined(LUA_PROGNAME)
