@@ -290,15 +290,15 @@ checkout('alo')
 
 
 -- testing os.exit
-prepfile("os.exit(nil, true)")
+prepfile("os.exit(nil)")
 RUN('lua %s', prog)
-prepfile("os.exit(0, true)")
+prepfile("os.exit(0)")
 RUN('lua %s', prog)
-prepfile("os.exit(true, true)")
+prepfile("os.exit(true)")
 RUN('lua %s', prog)
-prepfile("os.exit(1, true)")
+prepfile("os.exit(1)")
 NoRun("", "lua %s", prog)   -- no message
-prepfile("os.exit(false, true)")
+prepfile("os.exit(false)")
 NoRun("", "lua %s", prog)   -- no message
 
 -- remove temporary files

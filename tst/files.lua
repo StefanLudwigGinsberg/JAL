@@ -642,8 +642,8 @@ if not _port then
     {"kill -s KILL $$", "signal", 9},
     {"sh -c 'kill -s HUP $$'", "exit"},
     {progname .. ' -e " "', "ok"},
-    {progname .. ' -e "os.exit(0, true)"', "ok"},
-    {progname .. ' -e "os.exit(20, true)"', "exit", 20},
+    {progname .. ' -e "os.exit(0)"', "ok"},
+    {progname .. ' -e "os.exit(20)"', "exit", 20},
   }
   print("\n(some error messages are expected now)")
   for _, v in ipairs(tests) do

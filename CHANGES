@@ -12,6 +12,7 @@
 * Made the names of basic types fixed in the garbage collector.
 * A new API 'lua_callmeta' for calls to extended metamethods.
 * Created new basic type 'proxy' for envelopment of values.
+* Always close the state with 'exit' in the OS library.
 
 
 
