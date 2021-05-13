@@ -21,13 +21,6 @@
 
 
 /*
-** The hook table at registry[&HOOKKEY] maps threads to their current
-** hook function. (We only need the unique address of 'HOOKKEY'.)
-*/
-static const int HOOKKEY = 0;
-
-
-/*
 ** If L1 != L, L1 can be in any state, and therefore there are no
 ** guarantees about its stack space; any push in L1 must be
 ** checked.
@@ -306,7 +299,7 @@ static int db_upvaluejoin (lua_State *L) {
 static void hookf (lua_State *L, lua_Debug *ar) {
   static const char *const hooknames[] =
     {"call", "return", "line", "count", "tail call"};
-  lua_rawgetp(L, LUA_REGISTRYINDEX, &HOOKKEY);
+  lua_getfield(L, LUA_REGISTRYINDEX, LUA_HOOKKEY_TABLE);
   lua_pushthread(L);
   if (lua_rawget(L, -2) == LUA_TFUNCTION) {  /* is there a hook function? */
     lua_pushstring(L, hooknames[(int)ar->event]);  /* push event name */
@@ -359,12 +352,12 @@ static int db_sethook (lua_State *L) {
     count = (int)luaL_optinteger(L, arg + 3, 0);
     func = hookf; mask = makemask(smask, count);
   }
-  if (lua_rawgetp(L, LUA_REGISTRYINDEX, &HOOKKEY) == LUA_TNIL) {
+  if (lua_getfield(L, LUA_REGISTRYINDEX, LUA_HOOKKEY_TABLE) == LUA_TNIL) {
     lua_createtable(L, 0, 2);  /* create a hook table */
     lua_pushvalue(L, -1);
-    lua_rawsetp(L, LUA_REGISTRYINDEX, &HOOKKEY);  /* set it in position */
+    lua_setfield(L, LUA_REGISTRYINDEX, LUA_HOOKKEY_TABLE);  /* set hooktable */
     lua_pushstring(L, "k");
-    lua_setfield(L, -2, "__mode");  /** hooktable.__mode = "k" */
+    lua_setfield(L, -2, "__mode");  /* hooktable.__mode = "k" */
     lua_pushvalue(L, -1);
     lua_setmetatable(L, -2);  /* setmetatable(hooktable) = hooktable */
   }
@@ -388,7 +381,7 @@ static int db_gethook (lua_State *L) {
   else if (hook != hookf)  /* external hook? */
     lua_pushliteral(L, "external hook");
   else {  /* hook table must exist */
-    lua_rawgetp(L, LUA_REGISTRYINDEX, &HOOKKEY);
+    lua_getfield(L, LUA_REGISTRYINDEX, LUA_HOOKKEY_TABLE);
     checkstack(L, L1, 1);
     lua_pushthread(L1); lua_xmove(L1, L, 1);
     lua_rawget(L, -2);   /* 1st result = hooktable[L1] */

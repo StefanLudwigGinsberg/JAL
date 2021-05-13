@@ -28,8 +28,16 @@
 #define LUA_PRELOAD_TABLE	"_PRELOAD"
 
 
+/* key, in the registry, for table of loaded C libraries */
+#define LUA_CLIBS_TABLE		"_CLIBS"
+
+
 /* key, in the registry, for table of userdata metatables */
 #define LUA_METATABLE_TABLE	"_METATABLE"
+
+
+/* key, in the registry, for table of mapped thread hooks */
+#define LUA_HOOKKEY_TABLE	"_HOOKKEY"
 
 
 typedef struct luaL_Reg {

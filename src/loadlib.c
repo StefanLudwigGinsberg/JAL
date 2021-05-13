@@ -54,13 +54,6 @@
 /* separator for open functions in C libraries */
 #define LUA_OFSEP	"_"
 
-
-/*
-** unique key for table in the registry that keeps handles
-** for all loaded C libraries
-*/
-static const int CLIBS = 0;
-
 #define LIB_FAIL	"open"
 
 
@@ -316,7 +309,7 @@ static void setpath (lua_State *L, const char *fieldname,
 */
 static void *checkclib (lua_State *L, const char *path) {
   void *plib;
-  lua_rawgetp(L, LUA_REGISTRYINDEX, &CLIBS);
+  lua_getfield(L, LUA_REGISTRYINDEX, LUA_CLIBS_TABLE);
   lua_getfield(L, -1, path);
   plib = lua_touserdata(L, -1);  /* plib = CLIBS[path] */
   lua_pop(L, 2);  /* pop CLIBS table and 'plib' */
@@ -329,7 +322,7 @@ static void *checkclib (lua_State *L, const char *path) {
 ** registry.CLIBS[#CLIBS + 1] = plib  -- also keep a list of all libraries
 */
 static void addtoclib (lua_State *L, const char *path, void *plib) {
-  lua_rawgetp(L, LUA_REGISTRYINDEX, &CLIBS);
+  lua_getfield(L, LUA_REGISTRYINDEX, LUA_CLIBS_TABLE);
   lua_pushlightuserdata(L, plib);
   lua_pushvalue(L, -1);
   lua_setfield(L, -3, path);  /* CLIBS[path] = plib */
@@ -760,7 +753,7 @@ static void createclibstable (lua_State *L) {
   lua_pushcfunction(L, gctm);
   lua_setfield(L, -2, "__gc");  /* set finalizer for CLIBS table */
   lua_setmetatable(L, -2);
-  lua_rawsetp(L, LUA_REGISTRYINDEX, &CLIBS);  /* set CLIBS table in registry */
+  lua_setfield(L, LUA_REGISTRYINDEX, LUA_CLIBS_TABLE);  /* set CLIBS table */
 }
 
 
