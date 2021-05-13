@@ -303,9 +303,20 @@ LUALIB_API int luaL_newmetatable (lua_State *L, const char *tname) {
   lua_createtable(L, 0, 2);  /* create metatable */
   lua_pushstring(L, tname);
   lua_setfield(L, -2, "__type");  /* metatable.__type = tname */
-  lua_pushvalue(L, -1);
-  lua_setfield(L, LUA_REGISTRYINDEX, tname);  /* registry.name = metatable */
+  luaL_getsubtable(L, LUA_REGISTRYINDEX, LUA_METATABLE_TABLE);
+  lua_pushvalue(L, -2);
+  lua_setfield(L, -2, tname);  /* registry.METATABLE[tname] = metatable */
+  lua_pop(L, 1);
   return 1;
+}
+
+
+LUALIB_API int luaL_getmetatable (lua_State *L, const char *tname) {
+  int t;
+  luaL_getsubtable(L, LUA_REGISTRYINDEX, LUA_METATABLE_TABLE);
+  t = lua_getfield(L, -1, tname);
+  lua_remove(L, -2);
+  return t;
 }
 
 

@@ -28,6 +28,10 @@
 #define LUA_PRELOAD_TABLE	"_PRELOAD"
 
 
+/* key, in the registry, for table of userdata metatables */
+#define LUA_METATABLE_TABLE	"_METATABLE"
+
+
 typedef struct luaL_Reg {
   const char *name;
   lua_CFunction func;
@@ -60,6 +64,7 @@ LUALIB_API void (luaL_checktype) (lua_State *L, int arg, int t);
 LUALIB_API void (luaL_checkany) (lua_State *L, int arg);
 
 LUALIB_API int   (luaL_newmetatable) (lua_State *L, const char *tname);
+LUALIB_API int   (luaL_getmetatable) (lua_State *L, const char *tname);
 LUALIB_API void  (luaL_setmetatable) (lua_State *L, const char *tname);
 LUALIB_API void *(luaL_testudata) (lua_State *L, int ud, const char *tname);
 LUALIB_API void *(luaL_checkudata) (lua_State *L, int ud, const char *tname);
@@ -131,8 +136,6 @@ LUALIB_API void (luaL_requiref) (lua_State *L, const char *modname,
 
 #define luaL_dostring(L, s) \
 	(luaL_loadstring(L, s) || lua_pcall(L, 0, LUA_MULTRET, 0))
-
-#define luaL_getmetatable(L,n)	(lua_getfield(L, LUA_REGISTRYINDEX, (n)))
 
 #define luaL_opt(L,f,n,d)	(lua_isnoneornil(L,(n)) ? (d) : f(L,(n)))
 
