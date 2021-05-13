@@ -574,6 +574,22 @@ LUA_API int lua_pushthread (lua_State *L) {
 }
 
 
+LUA_API void lua_pushglobaltable(lua_State *L) {
+  lua_lock(L);
+  sethvalue(L, L->top, G(L)->globaltable);
+  api_incr_top(L);
+  lua_unlock(L);
+}
+
+
+LUA_API void lua_pushmainthread(lua_State *L) {
+  lua_lock(L);
+  setthvalue(L, L->top, G(L)->mainthread);
+  api_incr_top(L);
+  lua_unlock(L);
+}
+
+
 
 /*
 ** get functions (Lua -> stack)
@@ -598,9 +614,10 @@ static int auxgetstr (lua_State *L, const TValue *t, const char *k) {
 
 
 LUA_API int lua_getglobal (lua_State *L, const char *name) {
-  Table *reg = hvalue(&G(L)->l_registry);
+  TValue gt;
   lua_lock(L);
-  return auxgetstr(L, luaH_getint(reg, LUA_RIDX_GLOBALS), name);
+  sethvalue(L, &gt, G(L)->globaltable);
+  return auxgetstr(L, &gt, name);
 }
 
 
@@ -755,9 +772,10 @@ static void auxsetstr (lua_State *L, const TValue *t, const char *k) {
 
 
 LUA_API void lua_setglobal (lua_State *L, const char *name) {
-  Table *reg = hvalue(&G(L)->l_registry);
+  TValue gt;
   lua_lock(L);  /* unlock done in 'auxsetstr' */
-  auxsetstr(L, luaH_getint(reg, LUA_RIDX_GLOBALS), name);
+  sethvalue(L, &gt, G(L)->globaltable);
+  auxsetstr(L, &gt, name);
 }
 
 
@@ -1006,11 +1024,10 @@ LUA_API int lua_load (lua_State *L, lua_Reader reader, void *data,
   if (status == LUA_OK) {  /* no errors? */
     LClosure *f = clLvalue(L->top - 1);  /* get newly created function */
     if (f->nupvalues >= 1) {  /* does it have an upvalue? */
-      /* get global table from registry */
-      Table *reg = hvalue(&G(L)->l_registry);
-      const TValue *gt = luaH_getint(reg, LUA_RIDX_GLOBALS);
+      TValue gt;
       /* set global table as 1st upvalue of 'f' (may be LUA_ENV) */
-      setobj(L, f->upvals[0]->v, gt);
+      sethvalue(L, &gt, G(L)->globaltable);
+      setobj(L, f->upvals[0]->v, &gt);
       luaC_upvalbarrier(L, f->upvals[0]);
     }
   }

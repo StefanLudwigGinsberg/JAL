@@ -179,24 +179,6 @@ static void freestack (lua_State *L) {
 
 
 /*
-** Create registry table and its predefined values
-*/
-static void init_registry (lua_State *L, global_State *g) {
-  TValue temp;
-  /* create registry */
-  Table *registry = luaH_new(L);
-  sethvalue(L, &g->l_registry, registry);
-  luaH_resize(L, registry, LUA_RIDX_LAST, 0);
-  /* registry[LUA_RIDX_MAINTHREAD] = L */
-  setthvalue(L, &temp, L);  /* temp = L */
-  luaH_setint(L, registry, LUA_RIDX_MAINTHREAD, &temp);
-  /* registry[LUA_RIDX_GLOBALS] = table of globals */
-  sethvalue(L, &temp, luaH_new(L));  /* temp = new table (global table) */
-  luaH_setint(L, registry, LUA_RIDX_GLOBALS, &temp);
-}
-
-
-/*
 ** open parts of the state that may cause memory-allocation errors.
 ** ('g->version' != NULL flags that the state was completely build)
 */
@@ -204,10 +186,11 @@ static void f_luaopen (lua_State *L, void *ud) {
   global_State *g = G(L);
   UNUSED(ud);
   stack_init(L, L);  /* init stack */
-  init_registry(L, g);
+  sethvalue(L, &g->l_registry, luaH_new(L));  /* create the registry */
   luaS_init(L);
   luaT_init(L);
   luaX_init(L);
+  g->globaltable = luaH_new(L);  /* create global table */
   g->gcrunning = 1;  /* allow gc */
   g->version = lua_version(NULL);
   luai_userstateopen(L);
@@ -315,6 +298,7 @@ LUA_API lua_State *lua_newstate (lua_Alloc f, void *ud) {
   setnilvalue(&g->l_registry);
   g->panic = NULL;
   g->version = NULL;
+  g->globaltable = NULL;
   g->gcstate = GCSpause;
   g->gckind = KGC_NORMAL;
   g->allgc = g->finobj = g->tobefnz = g->fixedgc = NULL;
@@ -337,7 +321,8 @@ LUA_API lua_State *lua_newstate (lua_Alloc f, void *ud) {
 
 
 LUA_API void lua_close (lua_State *L) {
-  L = G(L)->mainthread;  /* only the main thread can be closed */
+  api_check(L, L == G(L)->mainthread,
+            "only the main thread can be closed");
   lua_lock(L);
   close_state(L);
 }

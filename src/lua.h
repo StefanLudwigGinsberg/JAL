@@ -83,12 +83,6 @@ typedef struct lua_State lua_State;
 #define LUA_MINSTACK	20
 
 
-/* predefined values in the registry */
-#define LUA_RIDX_MAINTHREAD	1
-#define LUA_RIDX_GLOBALS	2
-#define LUA_RIDX_LAST		LUA_RIDX_GLOBALS
-
-
 /* type of numbers in Lua */
 typedef LUA_NUMBER lua_Number;
 
@@ -231,6 +225,8 @@ LUA_API void  (lua_pushcclosure) (lua_State *L, lua_CFunction fn, int n);
 LUA_API void  (lua_pushboolean) (lua_State *L, int b);
 LUA_API void  (lua_pushlightuserdata) (lua_State *L, void *p);
 LUA_API int   (lua_pushthread) (lua_State *L);
+LUA_API void  (lua_pushglobaltable) (lua_State *L);
+LUA_API void  (lua_pushmainthread) (lua_State *L);
 
 
 /*
@@ -362,9 +358,6 @@ LUA_API void (lua_envelop) (lua_State *L, int idx);
 #define lua_isnoneornil(L, n)	(lua_type(L, (n)) <= 0)
 
 #define lua_pushliteral(L, s)	lua_pushstring(L, "" s)
-
-#define lua_pushglobaltable(L)  \
-	((void)lua_rawgeti(L, LUA_REGISTRYINDEX, LUA_RIDX_GLOBALS))
 
 #define lua_tostring(L,i)	lua_tolstring(L, (i), NULL)
 

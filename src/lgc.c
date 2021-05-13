@@ -344,6 +344,7 @@ static void restartcollection (global_State *g) {
   g->weak = g->allweak = g->ephemeron = NULL;
   markobject(g, g->mainthread);
   markvalue(g, &g->l_registry);
+  markobject(g, g->globaltable);
   markbeingfnz(g);  /* mark any finalizing object left from previous cycle */
 }
 
@@ -997,8 +998,9 @@ static l_mem atomic (lua_State *L) {
   g->gcstate = GCSinsideatomic;
   g->GCmemtrav = 0;  /* start counting work */
   markobject(g, L);  /* mark running thread */
-  /* registry may be changed by API */
+  /* registry and global table may be changed by API */
   markvalue(g, &g->l_registry);
+  markobject(g, g->globaltable);
   /* remark occasional upvalues of (maybe) dead threads */
   remarkupvals(g);
   propagateall(g);  /* propagate changes */

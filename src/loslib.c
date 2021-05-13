@@ -376,7 +376,8 @@ static int os_exit (lua_State *L) {
     status = (lua_toboolean(L, 1) ? EXIT_SUCCESS : EXIT_FAILURE);
   else
     status = (int)luaL_optinteger(L, 1, EXIT_SUCCESS);
-  lua_close(L);
+  lua_pushmainthread(L);
+  lua_close(lua_tothread(L, -1));
   if (L) exit(status);  /* 'if' to avoid warnings for unreachable 'return' */
   return 0;
 }

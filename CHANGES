@@ -14,6 +14,9 @@
 * Created new basic type 'proxy' for envelopment of values.
 * Always close the state with 'exit' in the OS library.
 * The interpreter now uses ">>>" for incomplete statements.
+* Removed any usage of entries in the registry from the core.
+* New 'lua_pushmainthread' for keeping track of the hierarchy.
+* Made 'lua_close' only accept a main thread as its argument.
 
 
 
