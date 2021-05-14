@@ -551,10 +551,8 @@ typedef struct Proxy {
 /*
 ** (address of) a fixed nil value
 */
-#define luaO_nilobject		(&luaO_nilobject_)
+#define luaO_nilobject(L)		(&G(L)->nilobject)
 
-
-LUAI_DDEC const TValue luaO_nilobject_;
 
 /* size of buffer for 'luaO_utf8esc' function */
 #define UTF8BUFFSZ	8

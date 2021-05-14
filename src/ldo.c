@@ -339,7 +339,7 @@ static int moveresults (lua_State *L, const TValue *firstResult, StkId res,
     case 0: break;  /* nothing to move */
     case 1: {  /* one result needed */
       if (nres == 0)   /* no results? */
-        firstResult = luaO_nilobject;  /* adjust with nil */
+        firstResult = luaO_nilobject(L);  /* adjust with nil */
       setobjs2s(L, res, firstResult);  /* move it to proper place */
       break;
     }

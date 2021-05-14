@@ -32,10 +32,10 @@
 
 
 /* value at a non-valid index */
-#define NONVALIDVALUE		cast(TValue *, luaO_nilobject)
+#define NONVALIDVALUE		cast(TValue *, luaO_nilobject(L))
 
 /* corresponding test */
-#define isvalid(o)	((o) != luaO_nilobject)
+#define isvalid(o)	((o) != luaO_nilobject(L))
 
 /* test for pseudo index */
 #define ispseudo(i)		((i) <= LUA_REGISTRYINDEX)
@@ -389,7 +389,7 @@ LUA_API size_t lua_rawlen (lua_State *L, int idx) {
     case LUA_TSHRSTR: return tsvalue(o)->shrlen;
     case LUA_TLNGSTR: return tsvalue(o)->u.lnglen;
     case LUA_TUSERDATA: return uvalue(o)->len;
-    case LUA_TTABLE: return cast(size_t, luaH_getn(hvalue(o)));
+    case LUA_TTABLE: return cast(size_t, luaH_getn(L, hvalue(o)));
     default: return 0;
   }
 }
@@ -661,7 +661,7 @@ LUA_API int lua_rawget (lua_State *L, int idx) {
   lua_lock(L);
   t = index2addr(L, idx);
   api_check(L, ttistable(t), "table expected");
-  setobj2s(L, L->top - 1, luaH_get(hvalue(t), L->top - 1));
+  setobj2s(L, L->top - 1, luaH_get(L, hvalue(t), L->top - 1));
   lua_unlock(L);
   return ttnov(L->top - 1);
 }
@@ -672,7 +672,7 @@ LUA_API int lua_rawgeti (lua_State *L, int idx, lua_Integer n) {
   lua_lock(L);
   t = index2addr(L, idx);
   api_check(L, ttistable(t), "table expected");
-  setobj2s(L, L->top, luaH_getint(hvalue(t), n));
+  setobj2s(L, L->top, luaH_getint(L, hvalue(t), n));
   api_incr_top(L);
   lua_unlock(L);
   return ttnov(L->top - 1);
@@ -686,7 +686,7 @@ LUA_API int lua_rawgetp (lua_State *L, int idx, const void *p) {
   t = index2addr(L, idx);
   api_check(L, ttistable(t), "table expected");
   setpvalue(&k, cast(void *, p));
-  setobj2s(L, L->top, luaH_get(hvalue(t), &k));
+  setobj2s(L, L->top, luaH_get(L, hvalue(t), &k));
   api_incr_top(L);
   lua_unlock(L);
   return ttnov(L->top - 1);

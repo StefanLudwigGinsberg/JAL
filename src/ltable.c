@@ -513,7 +513,7 @@ TValue *luaH_newkey (lua_State *L, Table *t, const TValue *key) {
 /*
 ** search function for integers
 */
-const TValue *luaH_getint (Table *t, lua_Integer key) {
+const TValue *luaH_getint (lua_State *L, Table *t, lua_Integer key) {
   /* (1 <= key && key <= t->sizearray) */
   if (l_castS2U(key) - 1 < t->sizearray)
     return &t->array[key - 1];
@@ -528,7 +528,7 @@ const TValue *luaH_getint (Table *t, lua_Integer key) {
         n += nx;
       }
     }
-    return luaO_nilobject;
+    return luaO_nilobject(L);
   }
 }
 
@@ -536,7 +536,7 @@ const TValue *luaH_getint (Table *t, lua_Integer key) {
 /*
 ** search function for short strings
 */
-const TValue *luaH_getshortstr (Table *t, TString *key) {
+const TValue *luaH_getshortstr (lua_State *L, Table *t, TString *key) {
   Node *n = hashstr(t, key);
   lua_assert(key->tt == LUA_TSHRSTR);
   for (;;) {  /* check whether 'key' is somewhere in the chain */
@@ -546,7 +546,7 @@ const TValue *luaH_getshortstr (Table *t, TString *key) {
     else {
       int nx = gnext(n);
       if (nx == 0)
-        return luaO_nilobject;  /* not found */
+        return luaO_nilobject(L);  /* not found */
       n += nx;
     }
   }
@@ -557,7 +557,7 @@ const TValue *luaH_getshortstr (Table *t, TString *key) {
 ** "Generic" get version. (Not that generic: not valid for integers,
 ** which may be in array part, nor for floats with integral values.)
 */
-static const TValue *getgeneric (Table *t, const TValue *key) {
+static const TValue *getgeneric (lua_State *L, Table *t, const TValue *key) {
   Node *n = mainposition(t, key);
   for (;;) {  /* check whether 'key' is somewhere in the chain */
     if (luaV_rawequalobj(gkey(n), key))
@@ -565,20 +565,20 @@ static const TValue *getgeneric (Table *t, const TValue *key) {
     else {
       int nx = gnext(n);
       if (nx == 0)
-        return luaO_nilobject;  /* not found */
+        return luaO_nilobject(L);  /* not found */
       n += nx;
     }
   }
 }
 
 
-const TValue *luaH_getstr (Table *t, TString *key) {
+const TValue *luaH_getstr (lua_State *L, Table *t, TString *key) {
   if (key->tt == LUA_TSHRSTR)
-    return luaH_getshortstr(t, key);
+    return luaH_getshortstr(L, t, key);
   else {  /* for long strings, use generic case */
     TValue ko;
     setsvalue(cast(lua_State *, NULL), &ko, key);
-    return getgeneric(t, &ko);
+    return getgeneric(L, t, &ko);
   }
 }
 
@@ -586,19 +586,19 @@ const TValue *luaH_getstr (Table *t, TString *key) {
 /*
 ** main search function
 */
-const TValue *luaH_get (Table *t, const TValue *key) {
+const TValue *luaH_get (lua_State *L, Table *t, const TValue *key) {
   switch (ttype(key)) {
-    case LUA_TSHRSTR: return luaH_getshortstr(t, tsvalue(key));
-    case LUA_TNUMINT: return luaH_getint(t, ivalue(key));
-    case LUA_TNIL: return luaO_nilobject;
+    case LUA_TSHRSTR: return luaH_getshortstr(L, t, tsvalue(key));
+    case LUA_TNUMINT: return luaH_getint(L, t, ivalue(key));
+    case LUA_TNIL: return luaO_nilobject(L);
     case LUA_TNUMFLT: {
       lua_Integer k;
       if (luaV_tointeger(key, &k, 0)) /* index is int? */
-        return luaH_getint(t, k);  /* use specialized version */
+        return luaH_getint(L, t, k);  /* use specialized version */
       /* else... */
     }  /* FALLTHROUGH */
     default:
-      return getgeneric(t, key);
+      return getgeneric(L, t, key);
   }
 }
 
@@ -608,17 +608,17 @@ const TValue *luaH_get (Table *t, const TValue *key) {
 ** barrier and invalidate the TM cache.
 */
 TValue *luaH_set (lua_State *L, Table *t, const TValue *key) {
-  const TValue *p = luaH_get(t, key);
-  if (p != luaO_nilobject)
+  const TValue *p = luaH_get(L, t, key);
+  if (p != luaO_nilobject(L))
     return cast(TValue *, p);
   else return luaH_newkey(L, t, key);
 }
 
 
 void luaH_setint (lua_State *L, Table *t, lua_Integer key, TValue *value) {
-  const TValue *p = luaH_getint(t, key);
+  const TValue *p = luaH_getint(L, t, key);
   TValue *cell;
-  if (p != luaO_nilobject)
+  if (p != luaO_nilobject(L))
     cell = cast(TValue *, p);
   else {
     TValue k;
@@ -629,16 +629,16 @@ void luaH_setint (lua_State *L, Table *t, lua_Integer key, TValue *value) {
 }
 
 
-static lua_Unsigned unbound_search (Table *t, lua_Unsigned j) {
+static lua_Unsigned unbound_search (lua_State *L, Table *t, lua_Unsigned j) {
   lua_Unsigned i = j;  /* i is zero or a present index */
   j++;
   /* find 'i' and 'j' such that i is present and j is not */
-  while (!ttisnil(luaH_getint(t, j))) {
+  while (!ttisnil(luaH_getint(L, t, j))) {
     i = j;
     if (j > l_castS2U(LUA_MAXINTEGER) / 2) {  /* overflow? */
       /* table was built with bad purposes: resort to linear search */
       i = 1;
-      while (!ttisnil(luaH_getint(t, i))) i++;
+      while (!ttisnil(luaH_getint(L, t, i))) i++;
       return i - 1;
     }
     j *= 2;
@@ -646,7 +646,7 @@ static lua_Unsigned unbound_search (Table *t, lua_Unsigned j) {
   /* now do a binary search between them */
   while (j - i > 1) {
     lua_Unsigned m = (i+j)/2;
-    if (ttisnil(luaH_getint(t, m))) j = m;
+    if (ttisnil(luaH_getint(L, t, m))) j = m;
     else i = m;
   }
   return i;
@@ -657,7 +657,7 @@ static lua_Unsigned unbound_search (Table *t, lua_Unsigned j) {
 ** Try to find a boundary in table 't'. A 'boundary' is an integer index
 ** such that t[i] is non-nil and t[i+1] is nil (and 0 if t[1] is nil).
 */
-lua_Unsigned luaH_getn (Table *t) {
+lua_Unsigned luaH_getn (lua_State *L, Table *t) {
   unsigned int j = t->sizearray;
   if (j > 0 && ttisnil(&t->array[j - 1])) {
     /* there is a boundary in the array part: (binary) search for it */
@@ -672,7 +672,7 @@ lua_Unsigned luaH_getn (Table *t) {
   /* else must find a boundary in hash part */
   else if (isdummy(t))  /* hash part is empty? */
     return j;  /* that is easy... */
-  else return unbound_search(t, j);
+  else return unbound_search(L, t, j);
 }
 
 

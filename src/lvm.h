@@ -58,7 +58,7 @@
 #define luaV_fastget(L,t,k,slot,f) \
   (!ttistable(t)  \
    ? (slot = NULL, 0)  /* not a table; 'slot' is NULL and result is 0 */  \
-   : (slot = f(hvalue(t), k),  /* else, do raw access */  \
+   : (slot = f(L, hvalue(t), k),  /* else, do raw access */  \
       !ttisnil(slot)))  /* result not nil? */
 
 /*
@@ -80,7 +80,7 @@
 #define luaV_fastset(L,t,k,slot,f,v) \
   (!ttistable(t) \
    ? (slot = NULL, 0) \
-   : (slot = f(hvalue(t), k), \
+   : (slot = f(L, hvalue(t), k), \
      ttisnil(slot) ? 0 \
      : (luaC_barrierback(L, hvalue(t), v), \
         setobj2t(L, cast(TValue *,slot), v), \

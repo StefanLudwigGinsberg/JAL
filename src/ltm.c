@@ -61,8 +61,10 @@ void luaT_init (lua_State *L) {
 ** function to be used with macro "fasttm": optimized for absence of
 ** tag methods
 */
-const TValue *luaT_gettm (Table *events, TMS event, TString *ename) {
-  const TValue *tm = luaH_getshortstr(events, ename);
+const TValue *luaT_gettm (lua_State *L, Table *events,
+                                        TMS event,
+                                        TString *ename) {
+  const TValue *tm = luaH_getshortstr(L, events, ename);
   lua_assert(event <= TM_EQ);
   if (ttisnil(tm)) {  /* no tag method? */
     events->flags |= cast_byte(1u<<event);  /* cache this fact */
@@ -88,7 +90,8 @@ const TValue *luaT_gettmbyobj (lua_State *L, const TValue *o, TMS event) {
       mt = NULL;
       break;
   }
-  return (mt ? luaH_getshortstr(mt, G(L)->tmname[event]) : luaO_nilobject);
+  return (mt ? luaH_getshortstr(L, mt, G(L)->tmname[event])
+             : luaO_nilobject(L));
 }
 
 
@@ -101,7 +104,7 @@ const char *luaT_objtypename (lua_State *L, const TValue *o) {
   if ((ttistable(o) && (mt = hvalue(o)->metatable) != NULL) ||
       (ttisfulluserdata(o) && (mt = uvalue(o)->metatable) != NULL) ||
       (ttisproxy(o) && (mt = pxvalue(o)->metatable) != NULL)) {
-    const TValue *name = luaH_getshortstr(mt, luaS_new(L, "__type"));
+    const TValue *name = luaH_getshortstr(L, mt, luaS_new(L, "__type"));
     if (ttisstring(name))  /* is '__type' a string? */
       return getstr(tsvalue(name));  /* use it as type name */
   }
