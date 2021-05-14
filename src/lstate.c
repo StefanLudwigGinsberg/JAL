@@ -177,6 +177,13 @@ static void freestack (lua_State *L) {
 }
 
 
+static TString *create_version (lua_State *L) {
+  TString *str = luaS_newliteral(L, LUA_VERSION);
+  luaC_fix(L, obj2gco(str));
+  return str;
+}
+
+
 /*
 ** open parts of the state that may cause memory-allocation errors.
 ** ('g->version' != NULL flags that the state was completely build)
@@ -191,7 +198,7 @@ static void f_luaopen (lua_State *L, void *ud) {
   luaX_init(L);
   g->globaltable = luaH_new(L);  /* create global table */
   g->gcrunning = 1;  /* allow gc */
-  g->version = lua_version(NULL);
+  g->version = create_version(L);
   luai_userstateopen(L);
 }
 

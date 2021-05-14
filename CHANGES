@@ -20,6 +20,7 @@
 * Extra parameter 'env' to all code-loading routines in the API.
 * New routine 'luaL_type' for retrieving any present metatype.
 * Avoid storing addresses of global variables in the state.
+* Made 'lua_version' return a string of the state's version.
 
 
 

@@ -166,7 +166,7 @@ typedef struct global_State {
   struct lua_State *mainthread;
   struct Table *globaltable;
   TValue nilobject;
-  const lua_Number *version;  /* pointer to version number */
+  TString *version;  /* version number string */
   TString *memerrmsg;  /* memory-error message */
   TString *tmname[TM_N];  /* array with tag-method names */
   TString *tpname[LUA_TOTALTAGS];  /* array with names of types */
