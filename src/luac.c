@@ -144,7 +144,7 @@ static const Proto* combine(lua_State* L, int n)
  {
   Proto* f;
   int i=n;
-  if (lua_load(L,reader,&i,"=(" PROGNAME ")",NULL)!=LUA_OK) fatal(lua_tostring(L,-1));
+  if (lua_load(L,reader,&i,"=(" PROGNAME ")",NULL,0)!=LUA_OK) fatal(lua_tostring(L,-1));
   f=toproto(L,-1);
   for (i=0; i<n; i++)
   {
@@ -172,7 +172,7 @@ static int pmain(lua_State* L)
  for (i=0; i<argc; i++)
  {
   const char* filename=IS("-") ? NULL : argv[i];
-  if (luaL_loadfile(L,filename)!=LUA_OK) fatal(lua_tostring(L,-1));
+  if (luaL_loadfile(L,filename,0)!=LUA_OK) fatal(lua_tostring(L,-1));
  }
  f=combine(L,argc);
  if (listing) luaU_print(f,listing>1);

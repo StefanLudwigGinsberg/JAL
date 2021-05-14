@@ -712,7 +712,8 @@ static int skipcomment (LoadF *lf, int *cp) {
 
 
 LUALIB_API int luaL_loadfilex (lua_State *L, const char *filename,
-                                             const char *mode) {
+                                             const char *mode,
+                                             int env) {
   LoadF lf;
   int status, readstatus;
   int c;
@@ -735,7 +736,7 @@ LUALIB_API int luaL_loadfilex (lua_State *L, const char *filename,
   }
   if (c != EOF)
     lf.buff[lf.n++] = c;  /* 'c' is the first character of the stream */
-  status = lua_load(L, getF, &lf, lua_tostring(L, -1), mode);
+  status = lua_load(L, getF, &lf, lua_tostring(L, -1), mode, env);
   readstatus = ferror(lf.f);
   if (filename) fclose(lf.f);  /* close file (even in case of errors) */
   if (readstatus) {
@@ -764,16 +765,16 @@ static const char *getS (lua_State *L, void *ud, size_t *size) {
 
 
 LUALIB_API int luaL_loadbufferx (lua_State *L, const char *buff, size_t size,
-                                 const char *name, const char *mode) {
+                                 const char *name, const char *mode, int env) {
   LoadS ls;
   ls.s = buff;
   ls.size = size;
-  return lua_load(L, getS, &ls, name, mode);
+  return lua_load(L, getS, &ls, name, mode, env);
 }
 
 
-LUALIB_API int luaL_loadstring (lua_State *L, const char *s) {
-  return luaL_loadbuffer(L, s, strlen(s), s);
+LUALIB_API int luaL_loadstring (lua_State *L, const char *s, int env) {
+  return luaL_loadbuffer(L, s, strlen(s), s, env);
 }
 
 /* }====================================================== */

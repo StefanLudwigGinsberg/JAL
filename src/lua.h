@@ -272,7 +272,7 @@ LUA_API int   (lua_pcallk) (lua_State *L, int nargs, int nresults, int errfunc,
 #define lua_pcall(L,n,r,f)	lua_pcallk(L, (n), (r), (f), 0, NULL)
 
 LUA_API int   (lua_load) (lua_State *L, lua_Reader reader, void *dt,
-                          const char *chunkname, const char *mode);
+                          const char *chunkname, const char *mode, int env);
 
 LUA_API int (lua_dump) (lua_State *L, lua_Writer writer, void *data, int strip);
 

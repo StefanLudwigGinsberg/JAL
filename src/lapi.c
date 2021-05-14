@@ -1014,7 +1014,7 @@ LUA_API int lua_pcallk (lua_State *L, int nargs, int nresults, int errfunc,
 
 
 LUA_API int lua_load (lua_State *L, lua_Reader reader, void *data,
-                      const char *chunkname, const char *mode) {
+                      const char *chunkname, const char *mode, int env) {
   ZIO z;
   int status;
   lua_lock(L);
@@ -1023,12 +1023,19 @@ LUA_API int lua_load (lua_State *L, lua_Reader reader, void *data,
   status = luaD_protectedparser(L, &z, chunkname, mode);
   if (status == LUA_OK) {  /* no errors? */
     LClosure *f = clLvalue(L->top - 1);  /* get newly created function */
-    if (f->nupvalues >= 1) {  /* does it have an upvalue? */
-      TValue gt;
-      /* set global table as 1st upvalue of 'f' (may be LUA_ENV) */
-      sethvalue(L, &gt, G(L)->globaltable);
-      setobj(L, f->upvals[0]->v, &gt);
-      luaC_upvalbarrier(L, f->upvals[0]);
+    if (f->nupvalues >= 1) {  /* does it have any upvalues? */
+      if (env != 0) {  /* do we have an environment? */
+        StkId val = index2addr(L, env);
+        api_checkvalidindex(L, val);
+        setobj(L, f->upvals[0]->v, val);  /* 1st upvalue of 'f' (LUA_ENV) */
+        luaC_upvalbarrier(L, f->upvals[0]);
+      }
+      else {  /* set global table as default */
+        TValue gt;
+        sethvalue(L, &gt, G(L)->globaltable);
+        setobj(L, f->upvals[0]->v, &gt);  /* 1st upvalue of 'f' (LUA_ENV) */
+        luaC_upvalbarrier(L, f->upvals[0]);
+      }
     }
   }
   lua_unlock(L);

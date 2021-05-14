@@ -270,29 +270,18 @@ static int luaB_ipairs (lua_State *L) {
 }
 
 
-static int load_aux (lua_State *L, int status, int envidx) {
-  if (status == LUA_OK) {
-    if (envidx != 0) {  /* 'env' parameter? */
-      lua_pushvalue(L, envidx);  /* environment for loaded function */
-      if (!lua_setupvalue(L, -2, 1))  /* set it as 1st upvalue */
-        lua_pop(L, 1);  /* remove 'env' if not used by previous call */
-    }
+static int luaB_loadfile (lua_State *L) {
+  const char *fname = luaL_optstring(L, 1, NULL);
+  const char *mode = luaL_optstring(L, 2, NULL);
+  int env = (!lua_isnone(L, 3) ? 3 : 0);  /* 'env' index or 0 if no 'env' */
+  int status = luaL_loadfilex(L, fname, mode, env);
+  if (status == LUA_OK)
     return 1;
-  }
   else {  /* error (message is on top of the stack) */
     lua_pushnil(L);
     lua_insert(L, -2);  /* put before error message */
     return 2;  /* return nil plus error message */
   }
-}
-
-
-static int luaB_loadfile (lua_State *L) {
-  const char *fname = luaL_optstring(L, 1, NULL);
-  const char *mode = luaL_optstring(L, 2, NULL);
-  int env = (!lua_isnone(L, 3) ? 3 : 0);  /* 'env' index or 0 if no 'env' */
-  int status = luaL_loadfilex(L, fname, mode);
-  return load_aux(L, status, env);
 }
 
 
@@ -342,15 +331,21 @@ static int luaB_load (lua_State *L) {
   int env = (!lua_isnone(L, 4) ? 4 : 0);  /* 'env' index or 0 if no 'env' */
   if (s != NULL) {  /* loading a string? */
     const char *chunkname = luaL_optstring(L, 2, s);
-    status = luaL_loadbufferx(L, s, l, chunkname, mode);
+    status = luaL_loadbufferx(L, s, l, chunkname, mode, env);
   }
   else {  /* loading from a reader function */
     const char *chunkname = luaL_optstring(L, 2, "=(load)");
     luaL_checktype(L, 1, LUA_TFUNCTION);
     lua_settop(L, RESERVEDSLOT);  /* create reserved slot */
-    status = lua_load(L, generic_reader, NULL, chunkname, mode);
+    status = lua_load(L, generic_reader, NULL, chunkname, mode, env);
   }
-  return load_aux(L, status, env);
+  if (status == LUA_OK)
+    return 1;
+  else {  /* error (message is on top of the stack) */
+    lua_pushnil(L);
+    lua_insert(L, -2);  /* put before error message */
+    return 2;  /* return nil plus error message */
+  }
 }
 
 /* }====================================================== */
@@ -365,7 +360,7 @@ static int dofilecont (lua_State *L, int d1, lua_KContext d2) {
 static int luaB_dofile (lua_State *L) {
   const char *fname = luaL_optstring(L, 1, NULL);
   lua_settop(L, 1);
-  if (luaL_loadfile(L, fname) != LUA_OK)
+  if (luaL_loadfile(L, fname, 0) != LUA_OK)
     return lua_error(L);
   lua_callk(L, 0, LUA_MULTRET, 0, dofilecont);
   return dofilecont(L, 0, 0);

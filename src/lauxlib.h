@@ -94,13 +94,14 @@ LUALIB_API int (luaL_ref) (lua_State *L, int t);
 LUALIB_API void (luaL_unref) (lua_State *L, int t, int ref);
 
 LUALIB_API int (luaL_loadfilex) (lua_State *L, const char *filename,
-                                               const char *mode);
+                                               const char *mode,
+                                               int env);
 
-#define luaL_loadfile(L,f)	luaL_loadfilex(L,f,NULL)
+#define luaL_loadfile(L,f,e)	luaL_loadfilex(L,f,NULL,e)
 
 LUALIB_API int (luaL_loadbufferx) (lua_State *L, const char *buff, size_t sz,
-                                   const char *name, const char *mode);
-LUALIB_API int (luaL_loadstring) (lua_State *L, const char *s);
+                                   const char *name, const char *mode, int env);
+LUALIB_API int (luaL_loadstring) (lua_State *L, const char *s, int env);
 
 LUALIB_API lua_State *(luaL_newstate) (void);
 
@@ -139,15 +140,15 @@ LUALIB_API void (luaL_requiref) (lua_State *L, const char *modname,
 
 #define luaL_typename(L,i)	lua_typename(L, lua_type(L,(i)))
 
-#define luaL_dofile(L, fn) \
-	(luaL_loadfile(L, fn) || lua_pcall(L, 0, LUA_MULTRET, 0))
+#define luaL_dofile(L, fn, e) \
+	(luaL_loadfile(L, fn, e) || lua_pcall(L, 0, LUA_MULTRET, 0))
 
-#define luaL_dostring(L, s) \
-	(luaL_loadstring(L, s) || lua_pcall(L, 0, LUA_MULTRET, 0))
+#define luaL_dostring(L, s, e) \
+	(luaL_loadstring(L, s, e) || lua_pcall(L, 0, LUA_MULTRET, 0))
 
 #define luaL_opt(L,f,n,d)	(lua_isnoneornil(L,(n)) ? (d) : f(L,(n)))
 
-#define luaL_loadbuffer(L,s,sz,n)	luaL_loadbufferx(L,s,sz,n,NULL)
+#define luaL_loadbuffer(L,s,sz,n,e)	luaL_loadbufferx(L,s,sz,n,NULL,e)
 
 
 /*
