@@ -1058,3 +1058,15 @@ LUALIB_API void luaL_checkversion_ (lua_State *L, lua_Number ver, size_t sz) {
                   (LUAI_UACNUMBER)ver, (LUAI_UACNUMBER)*v);
 }
 
+
+LUALIB_API int luaL_type (lua_State *L, int idx) {
+  int t = luaL_getmetafield(L, idx, "__type");
+  if (t == LUA_TSTRING)
+    return 1;
+  else {
+    if (t != LUA_TNIL)
+      lua_pop(L, 1);  /* remove the field */
+    lua_pushstring(L, lua_typename(L, lua_type(L, idx)));
+    return 0;
+  }
+}

@@ -18,6 +18,7 @@
 * New 'lua_pushmainthread' for keeping track of the hierarchy.
 * Made 'lua_close' only accept a main thread as its argument.
 * Extra parameter 'env' to all code-loading routines in the API.
+* New routine 'luaL_type' for retrieving any present metatype.
 
 
 

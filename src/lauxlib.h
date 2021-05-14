@@ -120,6 +120,8 @@ LUALIB_API void (luaL_traceback) (lua_State *L, lua_State *L1,
 LUALIB_API void (luaL_requiref) (lua_State *L, const char *modname,
                                  lua_CFunction openf, int glb);
 
+LUALIB_API int (luaL_type) (lua_State *L, int idx);
+
 /*
 ** ===============================================================
 ** some useful macros
